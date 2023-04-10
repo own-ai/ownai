@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %} - ownAI</title>
+  </head>
+  <body>
+    <nav>
+      {% if g.user %}
+        <span>{{ g.user['username'] }}</span>
+        <a href="{{ url_for('auth.logout') }}">Log Out</a>
+      {% else %}
+        <a href="{{ url_for('auth.login') }}">Log In</a>
+      {% endif %}
+    </nav>
+    <section class="content">
+      <header>
+        {% block header %}{% endblock %}
+      </header>
+      {% for message in get_flashed_messages() %}
+        <div class="flash">{{ message }}</div>
+      {% endfor %}
+      {% block content %}{% endblock %}
+    </section>
+  </body>
+</html>
