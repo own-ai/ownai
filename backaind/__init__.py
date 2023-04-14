@@ -1,7 +1,7 @@
 """Backaind is the ownAI Flask application to manage and run your own AI models."""
 import os
 
-from flask import Flask
+from flask import Flask, g
 from . import ainteraction, auth, db
 
 def create_app(test_config=None):
@@ -25,6 +25,7 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    app.before_request(register_vite_dev_server)
     db.init_app(app)
     auth.init_app(app)
 
@@ -33,3 +34,8 @@ def create_app(test_config=None):
     app.add_url_rule('/', endpoint='index')
 
     return app
+
+def register_vite_dev_server():
+    """Make Vite port available if Vite dev server should be used."""
+    g.vite_dev_server_enabled = 'VITE_PORT' in os.environ
+    g.vite_dev_server_port = os.environ.get('VITE_PORT')

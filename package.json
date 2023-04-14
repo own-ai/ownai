@@ -1,0 +1,39 @@
+{
+  "name": "ownai",
+  "version": "0.0.0",
+  "description": "Run your own AI",
+  "type": "module",
+  "scripts": {
+    "dev-frontaind": "vite",
+    "dev-backaind": "VITE_PORT=5173 flask --app backaind run --debug",
+    "dev": "concurrently 'npm:dev-*'",
+    "build": "vue-tsc && vite build",
+    "start": "flask --app backaind run --debug",
+    "test": "pytest",
+    "test-coverage": "coverage run -m pytest && coverage report && coverage html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/own-ai/ownai.git"
+  },
+  "author": "Jan Pawellek",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/own-ai/ownai/issues"
+  },
+  "homepage": "https://ownai.org",
+  "dependencies": {
+    "bootstrap": "^5.2.3",
+    "vue": "^3.2.47"
+  },
+  "devDependencies": {
+    "@types/node": "^18.15.11",
+    "@vitejs/plugin-vue": "^4.1.0",
+    "concurrently": "^8.0.1",
+    "glob": "^10.0.0",
+    "sass": "^1.61.0",
+    "typescript": "^5.0.4",
+    "vite": "^4.2.1",
+    "vue-tsc": "^1.2.0"
+  }
+}

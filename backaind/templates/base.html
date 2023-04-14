@@ -4,24 +4,49 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}{% endblock %} - ownAI</title>
+    {% block main_stylesheets %}
+      {% if g.vite_dev_server_enabled %}
+        <link rel="stylesheet" href="http://localhost:{{ g.vite_dev_server_port }}/main.scss">
+      {% else %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='ownai-main.css') }}">
+      {% endif %}
+    {% endblock %}
+    {% block stylesheets %}
+    {% endblock %}
   </head>
   <body>
-    <nav>
-      {% if g.user %}
-        <span>{{ g.user['username'] }}</span>
-        <a href="{{ url_for('auth.logout') }}">Log Out</a>
-      {% else %}
-        <a href="{{ url_for('auth.login') }}">Log In</a>
-      {% endif %}
+    <nav class="navbar border-bottom">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">ownAI</a>
+        <div class="d-flex gap-3">
+          {% if g.user %}
+            <span class="navbar-text">Hello {{ g.user['username'] }}</span>
+            <div class="navbar-nav">
+              <a class="nav-link" href="{{ url_for('auth.logout') }}">Log Out</a>
+            </div>
+          {% else %}
+            <div class="navbar-nav">
+              <a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
     </nav>
-    <section class="content">
-      <header>
-        {% block header %}{% endblock %}
-      </header>
+    <div class="container py-4 px-3 mx-auto">
       {% for message in get_flashed_messages() %}
-        <div class="flash">{{ message }}</div>
+        <div class="alert alert-warning" role="alert">{{ message }}</div>
       {% endfor %}
-      {% block content %}{% endblock %}
-    </section>
+      {% block main %}{% endblock %}
+    </div>
+    {% block main_scripts %}
+      {% if g.vite_dev_server_enabled %}
+        <script type="module" src="http://localhost:{{ g.vite_dev_server_port }}/@vite/client"></script>
+        <script type="module" src="http://localhost:{{ g.vite_dev_server_port }}/main.ts"></script>
+      {% else %}
+        <script type="module" src="{{ url_for('static', filename='ownai-main.js') }}"></script>
+      {% endif %}
+    {% endblock %}
+    {% block scripts %}
+    {% endblock %}
   </body>
 </html>

@@ -1,9 +1,16 @@
+{% from '_macros/assets.html' import css, js %}
 {% extends 'base.html' %}
 
-{% block header %}
-  <h1>{% block title %}Hello{% endblock %}</h1>
+{% block title %}Hello{% endblock %}
+
+{% block stylesheets %}
+  {{ css('ainteraction') }}
 {% endblock %}
 
-{% block content %}
-  <div>Coming soon</div>
+{% block scripts %}
+  {{ js('ainteraction') }}
+{% endblock %}
+
+{% block main %}
+  <div id="ainteraction"></div>
 {% endblock %}

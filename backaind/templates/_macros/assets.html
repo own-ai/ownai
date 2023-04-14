@@ -1,0 +1,13 @@
+{% macro css(module) %}
+  {% if not g.vite_dev_server_enabled %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='ownai-' ~ module ~ '.css') }}">
+  {% endif %}
+{% endmacro %}
+
+{% macro js(module) %}
+  {% if g.vite_dev_server_enabled %}
+    <script type="module" src="http://localhost:{{ g.vite_dev_server_port }}/{{ module }}.ts"></script>
+  {% else %}
+    <script type="module" src="{{ url_for('static', filename='ownai-' ~ module ~ '.js') }}"></script>
+  {% endif %}
+{% endmacro %}

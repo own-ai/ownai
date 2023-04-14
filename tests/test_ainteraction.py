@@ -10,8 +10,8 @@ def test_login_required(client, path):
     assert response.headers['Location'] == '/auth/login'
 
 def test_index(client, auth):
-    """Test whether the coming soon page gets displayed."""
+    """Test whether the ainteraction page gets displayed."""
     auth.login()
     response = client.get('/')
-    assert b'Hello' in response.data
-    assert b'Coming soon' in response.data
+    assert b'Hello - ownAI' in response.data
+    assert b'<div id="ainteraction">' in response.data
