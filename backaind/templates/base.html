@@ -17,16 +17,16 @@
   <body>
     <nav class="navbar border-bottom">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/">ownAI</a>
+        <a class="navbar-brand fw-bold" href="/">ownAI</a>
         <div class="d-flex gap-3">
           {% if g.user %}
             <span class="navbar-text">Hello {{ g.user['username'] }}</span>
             <div class="navbar-nav">
-              <a class="nav-link" href="{{ url_for('auth.logout') }}">Log Out</a>
+              <a class="nav-link link-primary" href="{{ url_for('auth.logout') }}">Log Out</a>
             </div>
           {% else %}
             <div class="navbar-nav">
-              <a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a>
+              <a class="nav-link link-primary" href="{{ url_for('auth.login') }}">Log In</a>
             </div>
           {% endif %}
         </div>

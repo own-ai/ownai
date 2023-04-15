@@ -1,19 +1,33 @@
-<script setup lang="ts">
-import { ref } from 'vue';
-
-const count = ref(0);
-</script>
-
 <template>
-  <div class="card">
-    <button type="button" class="btn btn-primary" @click="count++">
-      count is {{ count }}
-    </button>
-  </div>
+  <MessageHistory :messages="messages" />
+  <MessageInput @send-message="sendMessage" />
 </template>
 
-<style scoped>
-.card {
-  padding: 2rem;
-}
-</style>
+<script setup lang="ts">
+import { ref, reactive } from 'vue';
+import MessageHistory from './MessageHistory.vue';
+import MessageInput from './MessageInput.vue';
+import type { Message } from '@/types/ainteraction/Message';
+
+const messages = reactive<Message[]>([]);
+const nextMessageId = ref(1);
+
+const sendMessage = async (text: string) => {
+  messages.push({
+    id: nextMessageId.value++,
+    author: {
+      species: 'human',
+    },
+    date: new Date(),
+    text,
+  });
+  messages.push({
+    id: nextMessageId.value++,
+    author: {
+      species: 'ai',
+    },
+    date: new Date(),
+    text: '42',
+  });
+};
+</script>
