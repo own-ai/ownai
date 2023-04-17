@@ -12,6 +12,7 @@ setup(
     include_package_data=True,
     install_requires=[
         'flask',
+        'flask-socketio',
     ],
     long_description=(Path(__file__).parent / 'README.md').read_text(),
     long_description_content_type='text/markdown'

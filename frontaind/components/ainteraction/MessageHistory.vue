@@ -5,17 +5,36 @@
     :class="message.author.species === 'ai' && 'bg-light'"
     :key="message.id"
   >
-    <div class="card-body">
+    <div
+      class="card-body"
+      :class="message.status === 'writing' && 'writing'"
+    >
       {{ message.text }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue';
 import type { Message } from '@/types/ainteraction/Message';
 
 const { messages } = defineProps<{
   messages: Message[];
 }>();
 </script>
+
+<style scoped>
+@keyframes blink-animation {
+  to {
+    visibility: hidden;
+  }
+}
+
+.writing::after {
+  content: "";
+  width: 1ch;
+  height: 1em;
+  background: var(--ownai-primary);
+  display: inline-block;
+  animation: blink-animation 1s steps(3, start) infinite;
+}
+</style>

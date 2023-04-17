@@ -5,4 +5,5 @@ export interface Message {
   author: Author;
   date: Date;
   text: string;
+  status?: 'done' | 'writing' | 'error';
 }

@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev-frontaind": "vite",
-    "dev-backaind": "VITE_PORT=5173 flask --app backaind run --debug",
+    "dev-backaind": "VITE_PORT=5173 flask run --debug",
     "dev": "concurrently 'npm:dev-*'",
     "build": "vue-tsc && vite build",
-    "start": "flask --app backaind run --debug",
+    "start": "flask run --debug",
     "test": "pytest",
     "test-coverage": "coverage run -m pytest && coverage report && coverage html"
   },
@@ -24,6 +24,7 @@
   "homepage": "https://ownai.org",
   "dependencies": {
     "bootstrap": "^5.2.3",
+    "socket.io-client": "^4.6.1",
     "vue": "^3.2.47"
   },
   "devDependencies": {

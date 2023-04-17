@@ -1,0 +1,1 @@
+@keyframes blink-animation-36c02838{to{visibility:hidden}}.writing[data-v-36c02838]:after{content:"";width:1ch;height:1em;background:var(--ownai-primary);display:inline-block;animation:blink-animation-36c02838 1s steps(3,start) infinite}

@@ -2,7 +2,10 @@
 import os
 
 from flask import Flask, g
+from flask_socketio import SocketIO
 from . import ainteraction, auth, db
+
+socketio = SocketIO()
 
 def create_app(test_config=None):
     """Create a new ownAI Flask application."""
@@ -26,8 +29,10 @@ def create_app(test_config=None):
         pass
 
     app.before_request(register_vite_dev_server)
+    socketio.init_app(app)
     db.init_app(app)
     auth.init_app(app)
+    ainteraction.init_app(app)
 
     app.register_blueprint(auth.bp)
     app.register_blueprint(ainteraction.bp)

@@ -49,17 +49,17 @@ pip install -e .
 
 6. Initialize the database:
 ```
-flask --app backaind init-db
+flask init-db
 ```
 
 7. Register a new user:
 ```
-flask --app backaind register-user
+flask register-user
 ```
 
 8. Start the server:
 ```
-flask --app backaind run
+flask run
 ```
 
 Now, you should be able to access the ownAI web interface at `http://localhost:5000`.
