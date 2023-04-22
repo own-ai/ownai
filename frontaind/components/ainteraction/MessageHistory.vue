@@ -37,4 +37,8 @@ const { messages } = defineProps<{
   display: inline-block;
   animation: blink-animation 1s steps(3, start) infinite;
 }
+
+.card-body {
+  white-space: break-spaces;
+}
 </style>
