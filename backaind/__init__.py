@@ -9,15 +9,11 @@ socketio = SocketIO()
 
 def create_app(test_config=None):
     """Create a new ownAI Flask application."""
-    app = Flask(__name__, instance_relative_config=True)
-    app.config.from_mapping(
-        SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'ownAI.sqlite'),
-    )
+    app = Flask(__name__)
 
     if test_config is None:
-        # load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
+        # load from environment when not testing
+        app.config.from_prefixed_env('OWNAI')
     else:
         # load the test config if passed in
         app.config.from_mapping(test_config)
@@ -28,12 +24,14 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    # init blueprints and extensions
     app.before_request(register_vite_dev_server)
     socketio.init_app(app)
     db.init_app(app)
     auth.init_app(app)
     ainteraction.init_app(app)
 
+    # register blueprints
     app.register_blueprint(auth.bp)
     app.register_blueprint(ainteraction.bp)
     app.add_url_rule('/', endpoint='index')

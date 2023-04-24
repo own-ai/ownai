@@ -2,7 +2,7 @@
 
 With ownAI you can run your own AIs.
 
-ownAI is an open-source platform written in Python using the Flask framework. It allows you to host and manage AI models with a web interface for interaction. ownAI supports fine-tuning AI models for specific use-cases and provides a flexible environment for your AI projects.
+ownAI is an open-source platform written in Python using the Flask framework. It allows you to host and manage AI applications with a web interface for interaction. ownAI supports fine-tuning AI models for specific use-cases and provides a flexible environment for your AI projects.
 
 ## Table of Contents
 
@@ -15,7 +15,7 @@ ownAI is an open-source platform written in Python using the Flask framework. It
 
 ## Features
 
-- Host and manage AI models with ease
+- Host and manage AI applications with ease
 - Web-based interface for interacting with AI models
 - Support for model fine-tuning to suit specific needs
 - Open-source and community-driven
@@ -40,12 +40,12 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-4. Install ownAI:
+4. Install requirements:
 ```
-pip install -e .
+pip install -r requirements.txt
 ```
 
-5. Configure the server by editing the `instance/config.py` file.
+5. Configure the server by copying the `.env.template` file to `.env` and then editing the `.env` file.
 
 6. Initialize the database:
 ```

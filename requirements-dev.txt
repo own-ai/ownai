@@ -1,0 +1,12 @@
+# Non-pinned top-level dependencies to set up a dev environment for ownAI
+
+# "Must-have" dependencies (see setup.py -> install_requires)
+flask
+flask-socketio
+
+# Dev-Dependencies
+-e .
+python-dotenv
+pylint
+pytest
+coverage
