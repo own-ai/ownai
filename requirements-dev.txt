@@ -3,6 +3,10 @@
 # "Must-have" dependencies (see setup.py -> install_requires)
 flask
 flask-socketio
+langchain
+
+# Only needed if you want to use these services
+huggingface_hub
 
 # Dev-Dependencies
 -e .

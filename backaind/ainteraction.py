@@ -1,10 +1,10 @@
 """Allow interaction with an AI."""
 from datetime import datetime
-import time
 from flask import Blueprint, render_template, session
 from flask_socketio import emit, disconnect
 
 from backaind.auth import login_required
+from backaind.brain import reply
 
 bp = Blueprint('ainteraction', __name__)
 
@@ -22,14 +22,9 @@ def handle_incoming_message(message):
 
     response_id = message.get('responseId')
     message_text = message.get('message', {}).get('text', '')
-    response = ''
+    response = reply(message_text)
 
-    for i in range(5):
-        time.sleep(1)
-        next_token = str(i) + ' '
-        response += next_token
-        send_next_token(response_id, next_token)
-    send_response(response_id, response + message_text)
+    send_response(response_id, response)
 
 def init_app(app):
     """Register handling of incoming socket.io messages."""

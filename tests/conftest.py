@@ -18,6 +18,7 @@ def fixture_app():
         'TESTING': True,
         'DATABASE': db_path,
         'SECRET_KEY': 'Only4Testing',
+        'AIFILE': 'NotARealFile.aifile',
     })
 
     with app.app_context():

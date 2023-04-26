@@ -1,7 +1,7 @@
 """Test the Ainteraction module to interact with AI applications."""
 import pytest
 
-from backaind.ainteraction import handle_incoming_message
+from backaind.ainteraction import handle_incoming_message, send_next_token, send_response
 
 @pytest.mark.parametrize('path', (
     '/',
@@ -75,8 +75,12 @@ def test_handle_incoming_message(client, auth, monkeypatch):
     def fake_emit(_event, _arg):
         EmitRecorder.called = True
 
+    def fake_reply(_message):
+        return 'Fake response'
+
     monkeypatch.setattr('backaind.ainteraction.disconnect', fake_disconnect)
     monkeypatch.setattr('backaind.ainteraction.emit', fake_emit)
+    monkeypatch.setattr('backaind.ainteraction.reply', fake_reply)
 
     auth.login()
     with client:
@@ -85,3 +89,31 @@ def test_handle_incoming_message(client, auth, monkeypatch):
 
     assert not DisconnectRecorder.called
     assert EmitRecorder.called
+
+def test_send_next_token_emits_token(monkeypatch):
+    """Test if a call to send_next_token emits the 'token' event."""
+    class EmitRecorder:
+        """Helper class to record function call to emit()."""
+        event = None
+
+    def fake_emit(event, _arg):
+        EmitRecorder.event = event
+
+    monkeypatch.setattr('backaind.ainteraction.emit', fake_emit)
+    send_next_token(1, 'token_text')
+
+    assert EmitRecorder.event == 'token'
+
+def test_send_response_emits_message(monkeypatch):
+    """Test if a call to send_response emits the 'message' event."""
+    class EmitRecorder:
+        """Helper class to record function call to emit()."""
+        event = None
+
+    def fake_emit(event, _arg):
+        EmitRecorder.event = event
+
+    monkeypatch.setattr('backaind.ainteraction.emit', fake_emit)
+    send_response(1, 'message_text')
+
+    assert EmitRecorder.event == 'message'

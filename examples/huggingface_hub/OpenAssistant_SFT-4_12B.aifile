@@ -1,0 +1,29 @@
+{
+    "name": "OpenAssistant SFT-4 12B @HuggingFace-Hub",
+    "aifileversion": 1,
+    "chain": {
+        "memory": null,
+        "verbose": false,
+        "prompt": {
+            "input_variables": [
+                "text"
+            ],
+            "output_parser": null,
+            "partial_variables": {},
+            "template": "<|prompter|>{text}<|endoftext|><|assistant|>",
+            "template_format": "f-string",
+            "validate_template": true,
+            "_type": "prompt"
+        },
+        "llm": {
+            "repo_id": "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5",
+            "task": null,
+            "model_kwargs": {
+                "max_new_tokens": 200
+            },
+            "_type": "huggingface_hub"
+        },
+        "output_key": "text",
+        "_type": "llm_chain"
+    }
+}
