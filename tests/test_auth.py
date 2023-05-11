@@ -2,7 +2,7 @@
 import pytest
 from flask import g, session
 
-from backaind.auth import register_user
+from backaind.auth import add_user
 from backaind.db import get_db
 
 
@@ -40,7 +40,7 @@ def test_logout(client, auth):
         assert "user_id" not in session
 
 
-def test_register_user_command(app, runner):
+def test_add_user_command(app, runner):
     """Test whether registering a new user works."""
     username = "a-new-user"
     password = "a-password"
@@ -52,16 +52,12 @@ def test_register_user_command(app, runner):
         ).fetchone()
         assert user is None
 
-        result = runner.invoke(
-            register_user, input=f"{username}\n{password}\n{password}\n"
-        )
+        result = runner.invoke(add_user, input=f"{username}\n{password}\n{password}\n")
         assert "Registration successful" in result.output
         user = database.execute(
             "SELECT * FROM user WHERE username = ?", (username,)
         ).fetchone()
         assert user is not None
 
-        result = runner.invoke(
-            register_user, input=f"{username}\n{password}\n{password}\n"
-        )
+        result = runner.invoke(add_user, input=f"{username}\n{password}\n{password}\n")
         assert "already registered" in result.output

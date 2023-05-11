@@ -73,10 +73,10 @@ def login_required(view):
     return wrapped_view
 
 
-@click.command("register-user")
+@click.command("add-user")
 @click.option("--username", prompt="User name")
 @click.password_option()
-def register_user(username, password):
+def add_user(username, password):
     """Register a new user for the application."""
     database = get_db()
 
@@ -94,4 +94,4 @@ def register_user(username, password):
 
 def init_app(app):
     """Register auth CLI commands with the application instance."""
-    app.cli.add_command(register_user)
+    app.cli.add_command(add_user)

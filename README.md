@@ -60,7 +60,7 @@ flask init-db
 7. Register a new user:
 
 ```
-flask register-user
+flask add-user
 ```
 
 8. Start the server:
