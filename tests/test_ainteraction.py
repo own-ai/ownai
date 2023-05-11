@@ -19,7 +19,7 @@ def test_index(client, auth):
     """Test whether the ainteraction page gets displayed."""
     auth.login()
     response = client.get("/")
-    assert b"Hello - ownAI" in response.data
+    assert b"Hello" in response.data
     assert b'<div id="ainteraction">' in response.data
 
 

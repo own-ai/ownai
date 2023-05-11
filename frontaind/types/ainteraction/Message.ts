@@ -1,9 +1,9 @@
-import type { Author } from './Author';
+import type { Author } from "./Author";
 
 export interface Message {
   id: number;
   author: Author;
   date: Date;
   text: string;
-  status?: 'done' | 'writing' | 'error';
+  status?: "done" | "writing" | "error";
 }

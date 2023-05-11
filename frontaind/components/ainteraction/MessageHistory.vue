@@ -5,17 +5,14 @@
     :class="message.author.species === 'ai' && 'bg-light'"
     :key="message.id"
   >
-    <div
-      class="card-body"
-      :class="message.status === 'writing' && 'writing'"
-    >
+    <div class="card-body" :class="message.status === 'writing' && 'writing'">
       {{ message.text }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { Message } from '@/types/ainteraction/Message';
+import type { Message } from "@/types/ainteraction/Message";
 
 const { messages } = defineProps<{
   messages: Message[];

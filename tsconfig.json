@@ -17,6 +17,11 @@
       "@/*": ["frontaind/*"]
     }
   },
-  "include": ["frontaind/**/*.ts", "frontaind/**/*.d.ts", "frontaind/**/*.tsx", "frontaind/**/*.vue"],
+  "include": [
+    "frontaind/**/*.ts",
+    "frontaind/**/*.d.ts",
+    "frontaind/**/*.tsx",
+    "frontaind/**/*.vue"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

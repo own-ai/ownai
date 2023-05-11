@@ -25,22 +25,26 @@ ownAI is an open-source platform written in Python using the Flask framework. It
 ownAI requires Python 3.8 or higher. To install and set up ownAI, follow these steps:
 
 1. Clone the repository:
+
 ```
 git clone https://github.com/own-ai/ownAI.git
 ```
 
 2. Enter the project directory:
+
 ```
 cd ownAI
 ```
 
 3. Create a virtual environment and activate it:
+
 ```
 python3 -m venv venv
 source venv/bin/activate
 ```
 
 4. Install requirements:
+
 ```
 pip install -r requirements.txt
 ```
@@ -48,16 +52,19 @@ pip install -r requirements.txt
 5. Configure the server by copying the `.env.template` file to `.env` and then editing the `.env` file.
 
 6. Initialize the database:
+
 ```
 flask init-db
 ```
 
 7. Register a new user:
+
 ```
 flask register-user
 ```
 
 8. Start the server:
+
 ```
 flask run
 ```
@@ -85,6 +92,7 @@ ownAI supports fine-tuning AI models for specific use-cases. To fine-tune a mode
 2. Configure the fine-tuning settings in the `instance/config.py` file.
 
 3. Run the fine-tuning script:
+
 ```
 python finetune.py
 ```

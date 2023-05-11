@@ -1,16 +1,33 @@
 {% extends 'base.html' %}
 
-{% block title %}Log In{% endblock %}
+{% block title %}
+  Log In
+{% endblock %}
 
 {% block main %}
-  <form method="post" class="d-flex flex-column gap-3 mx-auto col-sm-9 col-md-6">
+  <form
+    method="post"
+    class="d-flex flex-column gap-3 mx-auto col-sm-9 col-md-6"
+  >
     <div>
       <label for="username" class="form-label">Username</label>
-      <input type="text" name="username" id="username" class="form-control" required>
+      <input
+        type="text"
+        name="username"
+        id="username"
+        class="form-control"
+        required
+      />
     </div>
     <div>
       <label for="password" class="form-label">Password</label>
-      <input type="password" name="password" id="password" class="form-control" required>
+      <input
+        type="password"
+        name="password"
+        id="password"
+        class="form-control"
+        required
+      />
     </div>
     <button type="submit" class="btn btn-primary">Log In</button>
   </form>
