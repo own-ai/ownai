@@ -6,11 +6,11 @@
         "verbose": false,
         "prompt": {
             "input_variables": [
-                "text"
+                "input_text"
             ],
             "output_parser": null,
             "partial_variables": {},
-            "template": "<|prompter|>{text}<|endoftext|><|assistant|>",
+            "template": "<|prompter|>{input_text}<|endoftext|><|assistant|>",
             "template_format": "f-string",
             "validate_template": true,
             "_type": "prompt"
@@ -23,7 +23,7 @@
             },
             "_type": "huggingface_hub"
         },
-        "output_key": "text",
+        "output_key": "output_text",
         "_type": "llm_chain"
     }
 }

@@ -5,6 +5,10 @@ flask
 flask-socketio
 langchain
 
+# If you want to use knowledge
+chromadb
+sentence_transformers
+
 # Only needed if you want to use these services
 huggingface_hub
 
