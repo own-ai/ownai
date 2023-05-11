@@ -7,13 +7,14 @@ from . import ainteraction, auth, db
 
 socketio = SocketIO()
 
+
 def create_app(test_config=None):
     """Create a new ownAI Flask application."""
     app = Flask(__name__)
 
     if test_config is None:
         # load from environment when not testing
-        app.config.from_prefixed_env('OWNAI')
+        app.config.from_prefixed_env("OWNAI")
     else:
         # load the test config if passed in
         app.config.from_mapping(test_config)
@@ -34,11 +35,12 @@ def create_app(test_config=None):
     # register blueprints
     app.register_blueprint(auth.bp)
     app.register_blueprint(ainteraction.bp)
-    app.add_url_rule('/', endpoint='index')
+    app.add_url_rule("/", endpoint="index")
 
     return app
 
+
 def register_vite_dev_server():
     """Make Vite port available if Vite dev server should be used."""
-    g.vite_dev_server_enabled = 'VITE_PORT' in os.environ
-    g.vite_dev_server_port = os.environ.get('VITE_PORT')
+    g.vite_dev_server_enabled = "VITE_PORT" in os.environ
+    g.vite_dev_server_port = os.environ.get("VITE_PORT")

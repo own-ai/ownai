@@ -9,6 +9,7 @@
     "dev": "concurrently 'npm:dev-*'",
     "build": "vue-tsc && vite build",
     "start": "flask run --debug",
+    "format": "black .",
     "test": "pytest",
     "test-coverage": "coverage run -m pytest && coverage report && coverage html"
   },

@@ -3,18 +3,18 @@ from pathlib import Path
 from setuptools import find_packages, setup
 
 setup(
-    name='ownAI',
-    version='0.0.0',
-    description='Run your own AI',
-    url='https://ownai.org',
-    license='MIT',
+    name="ownAI",
+    version="0.0.0",
+    description="Run your own AI",
+    url="https://ownai.org",
+    license="MIT",
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
-        'flask',
-        'flask-socketio',
-        'langchain',
+        "flask",
+        "flask-socketio",
+        "langchain",
     ],
-    long_description=(Path(__file__).parent / 'README.md').read_text(),
-    long_description_content_type='text/markdown'
+    long_description=(Path(__file__).parent / "README.md").read_text(),
+    long_description_content_type="text/markdown",
 )
