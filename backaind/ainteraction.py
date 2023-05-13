@@ -1,10 +1,13 @@
 """Allow interaction with an AI."""
 from datetime import datetime
+import json
 from flask import Blueprint, render_template, session
 from flask_socketio import emit, disconnect
 
+from backaind.aifile import get_all_aifiles_from_db
 from backaind.auth import login_required
 from backaind.brain import reply
+from backaind.knowledge import get_all_knowledge_entries_from_db
 
 bp = Blueprint("ainteraction", __name__)
 
@@ -13,7 +16,31 @@ bp = Blueprint("ainteraction", __name__)
 @login_required
 def index():
     """Render the main ainteraction view."""
-    return render_template("ainteraction/index.html")
+    aifiles = get_all_aifiles_from_db()
+    ailist = []
+    for aifile in aifiles:
+        ailist.append(
+            {
+                "id": aifile["id"],
+                "name": aifile["name"],
+                "input_keys": json.loads(aifile["input_keys"]),
+            }
+        )
+    knowledge_entries = get_all_knowledge_entries_from_db()
+    knowledge_list = []
+    for knowledge_entry in knowledge_entries:
+        knowledge_list.append(
+            {
+                "id": knowledge_entry["id"],
+                "name": knowledge_entry["name"],
+            }
+        )
+
+    return render_template(
+        "ainteraction/index.html",
+        ais=json.dumps(ailist),
+        knowledges=json.dumps(knowledge_list),
+    )
 
 
 def handle_incoming_message(message):
@@ -23,8 +50,10 @@ def handle_incoming_message(message):
         return
 
     response_id = message.get("responseId")
+    ai_id = message.get("aiId")
+    knowledge_id = message.get("knowledgeId")
     message_text = message.get("message", {}).get("text", "")
-    response = reply(message_text)
+    response = reply(ai_id, message_text, knowledge_id)
 
     send_response(response_id, response)
 

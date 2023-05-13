@@ -54,6 +54,7 @@ def test_add_user_command(app, runner):
 
         result = runner.invoke(add_user, input=f"{username}\n{password}\n{password}\n")
         assert "Registration successful" in result.output
+
         user = database.execute(
             "SELECT * FROM user WHERE username = ?", (username,)
         ).fetchone()

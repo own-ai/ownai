@@ -3,7 +3,7 @@ import os
 
 from flask import Flask, g
 from flask_socketio import SocketIO
-from . import ainteraction, auth, db
+from . import aifile, ainteraction, auth, db, knowledge
 
 socketio = SocketIO()
 
@@ -30,7 +30,9 @@ def create_app(test_config=None):
     socketio.init_app(app)
     db.init_app(app)
     auth.init_app(app)
+    aifile.init_app(app)
     ainteraction.init_app(app)
+    knowledge.init_app(app)
 
     # register blueprints
     app.register_blueprint(auth.bp)

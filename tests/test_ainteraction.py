@@ -20,7 +20,7 @@ def test_index(client, auth):
     auth.login()
     response = client.get("/")
     assert b"Hello" in response.data
-    assert b'<div id="ainteraction">' in response.data
+    assert b'id="ainteraction"' in response.data
 
 
 test_incoming_message = {
@@ -88,7 +88,7 @@ def test_handle_incoming_message(client, auth, monkeypatch):
     def fake_emit(_event, _arg):
         EmitRecorder.called = True
 
-    def fake_reply(_message):
+    def fake_reply(_ai_id, _input_text, _knowledge_id):
         return "Fake response"
 
     monkeypatch.setattr("backaind.ainteraction.disconnect", fake_disconnect)
