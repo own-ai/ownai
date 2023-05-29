@@ -24,11 +24,17 @@
   },
   "homepage": "https://ownai.org",
   "dependencies": {
+    "@codemirror/lang-json": "^6.0.1",
+    "@replit/codemirror-indentation-markers": "^6.4.2",
     "bootstrap": "^5.2.3",
+    "codemirror": "^6.0.1",
+    "pinia": "^2.0.36",
     "socket.io-client": "^4.6.1",
-    "vue": "^3.2.47"
+    "vue": "^3.2.47",
+    "vue-router": "^4.2.1"
   },
   "devDependencies": {
+    "@types/bootstrap": "^5.2.3",
     "@types/node": "^18.15.11",
     "@vitejs/plugin-vue": "^4.1.0",
     "concurrently": "^8.0.1",

@@ -4,6 +4,7 @@ import functools
 import click
 from flask import (
     Blueprint,
+    abort,
     flash,
     g,
     redirect,
@@ -61,11 +62,16 @@ def load_logged_in_user():
 
 
 def login_required(view):
-    """Wrap a view to instead redirect to login page if the user is not logged in."""
+    """
+    Wrap a view to instead redirect to login page if the user is not logged in.
+    For API requests, this does not redirect, but returns a 401 Unauthorized status code.
+    """
 
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:
+            if request.path.startswith("/api/"):
+                abort(401)
             return redirect(url_for("auth.login"))
 
         return view(**kwargs)

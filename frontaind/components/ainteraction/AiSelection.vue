@@ -25,7 +25,7 @@
       >
         {{ selectedAi ? selectedAi.name : "Select AI" }}
       </button>
-      <ul class="dropdown-menu w-100">
+      <ul class="dropdown-menu w-100 m-0">
         <li v-for="aiDefinition in aiDefinitions" :key="aiDefinition.id">
           <a
             class="dropdown-item d-flex align-items-center gap-2 py-2"

@@ -20,7 +20,7 @@
       >
         {{ selectedKnowledge ? selectedKnowledge.name : "Select Knowledge" }}
       </button>
-      <ul class="dropdown-menu w-100">
+      <ul class="dropdown-menu w-100 m-0">
         <li
           v-for="knowledgeDefinition in knowledgeDefinitions"
           :key="knowledgeDefinition.id"

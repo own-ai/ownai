@@ -2,3 +2,32 @@ $prefix: ownai-;
 $primary: #6464f1;
 
 @import "bootstrap/scss/bootstrap";
+
+.navbar-brand.dropdown-toggle::after {
+  color: var(--ownai-secondary);
+}
+
+.btn-hover-light {
+  color: var(--ownai-body-color);
+  background-color: var(--ownai-body-bg);
+}
+
+.btn-hover-light:hover,
+.btn-hover-light:focus {
+  color: var(--ownai-link-hover-color);
+  background-color: rgba(var(--ownai-light-rgb), 1) !important;
+}
+
+.dropdown-item-danger {
+  color: var(--ownai-red);
+}
+
+.dropdown-item-danger:hover,
+.dropdown-item-danger:focus {
+  color: #fff;
+  background-color: var(--ownai-red);
+}
+
+.dropdown-item-danger.active {
+  background-color: var(--ownai-red);
+}

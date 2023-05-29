@@ -3,7 +3,8 @@ import os
 
 from flask import Flask, g
 from flask_socketio import SocketIO
-from . import aifile, ainteraction, auth, db, knowledge
+from backaind import aifile, ainteraction, auth, db, knowledge, workshop
+from backaind.api import ai
 
 socketio = SocketIO()
 
@@ -37,6 +38,8 @@ def create_app(test_config=None):
     # register blueprints
     app.register_blueprint(auth.bp)
     app.register_blueprint(ainteraction.bp)
+    app.register_blueprint(workshop.bp)
+    app.register_blueprint(ai.bp)
     app.add_url_rule("/", endpoint="index")
 
     return app

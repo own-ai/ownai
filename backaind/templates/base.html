@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-100">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -20,20 +20,13 @@
     {% block stylesheets %}
     {% endblock %}
   </head>
-  <body>
+  <body class="h-100 d-flex flex-column">
     <nav class="navbar border-bottom">
       <div class="container-fluid">
-        <a class="navbar-brand fw-bold" href="/">ownAI</a>
+        {% include '_includes/main_menu.html' %}
         <div class="d-flex gap-3">
           {% if g.user %}
-            <span class="navbar-text">Hello {{ g.user['username'] }}</span>
-            <div class="navbar-nav">
-              <a
-                class="nav-link link-primary"
-                href="{{ url_for('auth.logout') }}"
-                >Log Out</a
-              >
-            </div>
+            {% include '_includes/user_menu.html' %}
           {% else %}
             <div class="navbar-nav">
               <a
@@ -46,7 +39,9 @@
         </div>
       </div>
     </nav>
-    <div class="container py-4 px-3 mx-auto">
+    <div
+      class="{% block main_classes %}container py-4 px-3 mx-auto{% endblock %}"
+    >
       {% for message in get_flashed_messages() %}
         <div class="alert alert-warning" role="alert">{{ message }}</div>
       {% endfor %}
