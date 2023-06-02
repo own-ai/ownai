@@ -16,6 +16,7 @@ clickhouse-connect==0.5.23
 coverage==7.2.5
 dataclasses-json==0.5.7
 dill==0.3.6
+docx2txt==0.8
 duckdb==0.7.1
 fastapi==0.95.1
 filelock==3.12.0
@@ -60,6 +61,7 @@ pluggy==1.0.0
 posthog==3.0.1
 pydantic==1.10.7
 pylint==2.17.4
+pypdf==3.9.0
 pytest==7.3.1
 python-dateutil==2.8.2
 python-dotenv==1.0.0

@@ -1,13 +1,13 @@
 """Test access to the vector store."""
-import tempfile
-import shutil
 from flask import session
 import pytest
+from langchain.docstore.document import Document
 from langchain.embeddings.base import Embeddings
 from langchain.vectorstores.base import VectorStore
 from backaind.db import get_db
 from backaind.knowledge import (
     add_knowledge,
+    add_to_knowledge,
     get_embeddings,
     get_knowledge,
     get_all_knowledge_entries_from_db,
@@ -36,12 +36,10 @@ def test_get_embeddings_returns_embeddings(client):
 
 def test_get_knowledge_returns_vector_store(client):
     """Test if get_knowledge() returns a VectorStore instance."""
-    knowledge_path = tempfile.mkdtemp()
     with client:
         client.get("/")
         knowledge = get_knowledge(1)
         assert isinstance(knowledge, VectorStore)
-    shutil.rmtree(knowledge_path)
 
 
 def test_get_knowledge_returns_from_session(client):
@@ -51,6 +49,18 @@ def test_get_knowledge_returns_from_session(client):
         session["knowledge[1]"] = "NotRealKnowledge"
         knowledge = get_knowledge(1)
         assert knowledge == "NotRealKnowledge"
+
+
+def test_add_to_knowledge_adds_documents(client):
+    """Test if adding documents to knowledge works."""
+    with client:
+        client.get("/")
+        add_to_knowledge(
+            1, [Document(page_content="Test Document", metadata={"source": "Test"})]
+        )
+        knowledge = get_knowledge(1)
+        results = knowledge.similarity_search("Test Document")
+        assert results.pop().page_content == "Test Document"
 
 
 def test_get_knowledge_entry_from_db_returns_entry(app):
@@ -71,6 +81,7 @@ def test_add_knowledge_command_adds_knowledge(app, runner):
     """Test if the add-knowledge command adds a new knowledge entry to the database."""
     knowledge_name = "Test"
     knowledge_embeddings = "huggingface"
+    knowledge_chunk_size = "500"
     knowledge_persist_directory = "instance/knowledge-test"
     with app.app_context():
         database = get_db()
@@ -82,7 +93,8 @@ def test_add_knowledge_command_adds_knowledge(app, runner):
 
         result = runner.invoke(
             add_knowledge,
-            input=f"{knowledge_name}\n{knowledge_embeddings}\n{knowledge_persist_directory}",
+            input=f"{knowledge_name}\n{knowledge_embeddings}\n{knowledge_chunk_size}\n"
+            + f"{knowledge_persist_directory}",
         )
         assert f"Added {knowledge_name}" in result.output
 
@@ -96,6 +108,7 @@ def test_add_knowledge_command_updates_knowledge(app, runner):
     """Test if the add-knowledge command updates knowledge with the same name."""
     knowledge_name = "Test 1"
     knowledge_embeddings = "huggingface"
+    knowledge_chunk_size = "500"
     knowledge_persist_directory = "instance/knowledge"
     with app.app_context():
         database = get_db()
@@ -111,7 +124,8 @@ def test_add_knowledge_command_updates_knowledge(app, runner):
 
         result = runner.invoke(
             add_knowledge,
-            input=f"{knowledge_name}\n{knowledge_embeddings}\n{knowledge_persist_directory}",
+            input=f"{knowledge_name}\n{knowledge_embeddings}\n{knowledge_chunk_size}\n"
+            + f"{knowledge_persist_directory}",
         )
         assert f"Updated {knowledge_name}" in result.output
 

@@ -1,5 +1,6 @@
 """Define test configuration and fixtures."""
 import os
+import shutil
 import tempfile
 
 import pytest
@@ -31,6 +32,8 @@ def fixture_app():
 
     os.close(db_fd)
     os.unlink(db_path)
+    if os.path.exists("instance/test-knowledge-1"):
+        shutil.rmtree("instance/test-knowledge-1")
 
 
 @pytest.fixture(name="client")

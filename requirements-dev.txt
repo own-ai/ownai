@@ -9,6 +9,10 @@ langchain
 chromadb
 sentence_transformers
 
+# Document loaders for knowledge
+docx2txt
+pypdf
+
 # Only needed if you want to use these services
 huggingface_hub
 

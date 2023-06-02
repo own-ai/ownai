@@ -4,7 +4,7 @@ import os
 from flask import Flask, g
 from flask_socketio import SocketIO
 from backaind import aifile, ainteraction, auth, db, knowledge, workshop
-from backaind.api import ai
+from backaind.api import ai as api_ai, knowledge as api_knowledge
 
 socketio = SocketIO()
 
@@ -39,7 +39,8 @@ def create_app(test_config=None):
     app.register_blueprint(auth.bp)
     app.register_blueprint(ainteraction.bp)
     app.register_blueprint(workshop.bp)
-    app.register_blueprint(ai.bp)
+    app.register_blueprint(api_ai.bp)
+    app.register_blueprint(api_knowledge.bp)
     app.add_url_rule("/", endpoint="index")
 
     return app

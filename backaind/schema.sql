@@ -18,5 +18,6 @@ CREATE TABLE knowledge (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
   embeddings TEXT NOT NULL,
+  chunk_size INTEGER NOT NULL,
   persist_directory TEXT NOT NULL
 );

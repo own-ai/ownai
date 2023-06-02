@@ -2,8 +2,10 @@
     Provide vector store capabilities to save and access 'knowledge'.
     Currently only Chroma is supported as vector store.
 """
+from typing import List
 import click
 from flask import session
+from langchain.docstore.document import Document
 from langchain.embeddings.base import Embeddings
 from langchain.vectorstores.base import VectorStore
 from langchain.vectorstores import Chroma
@@ -38,6 +40,17 @@ def get_knowledge(knowledge_id: int) -> VectorStore:
     return knowledge
 
 
+def add_to_knowledge(knowledge_id: int, documents: List[Document]):
+    """Add documents to the specified knowledge."""
+    knowledge_entry = get_knowledge_entry_from_db(knowledge_id)
+    knowledge = Chroma(
+        persist_directory=knowledge_entry["persist_directory"],
+        embedding_function=get_embeddings(knowledge_entry["embeddings"]),
+    )
+    knowledge.add_documents(documents)
+    knowledge.persist()
+
+
 def get_knowledge_entry_from_db(knowledge_id: int):
     """Return a specific knowledge entry from the database."""
     database = get_db()
@@ -61,10 +74,11 @@ def get_all_knowledge_entries_from_db():
     prompt="Embeddings",
     type=click.Choice(["huggingface"], case_sensitive=False),
 )
+@click.option("--chunk-size", prompt="Chunk size in characters", type=int, default=500)
 @click.option(
     "--persist-directory", prompt="Directory to persist the knowledge database"
 )
-def add_knowledge(name, embeddings, persist_directory):
+def add_knowledge(name, embeddings, chunk_size, persist_directory):
     """Register a new knowledge store or update a knowledge store with the same name."""
     embeddings = embeddings.lower()
     database = get_db()
@@ -75,15 +89,22 @@ def add_knowledge(name, embeddings, persist_directory):
 
     if existing_knowledge is None:
         database.execute(
-            "INSERT INTO knowledge (name, embeddings, persist_directory) VALUES (?, ?, ?)",
-            (name, embeddings, persist_directory),
+            """
+            INSERT INTO knowledge (name, embeddings, chunk_size, persist_directory)
+            VALUES (?, ?, ?, ?)
+            """,
+            (name, embeddings, chunk_size, persist_directory),
         )
         database.commit()
         click.echo(f"Added {name}. Thank you for making me smarter!")
     else:
         database.execute(
-            "UPDATE knowledge SET embeddings = ?, persist_directory = ? WHERE name = ?",
-            (embeddings, persist_directory, name),
+            """
+            UPDATE knowledge
+            SET embeddings = ?, chunk_size = ?, persist_directory = ?
+            WHERE name = ?
+            """,
+            (embeddings, chunk_size, persist_directory, name),
         )
         database.commit()
         click.echo(f"Updated {name}. Thank you for making me smarter!")
