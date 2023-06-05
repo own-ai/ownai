@@ -104,6 +104,34 @@ def test_handle_incoming_message(client, auth, monkeypatch):
     assert EmitRecorder.called
 
 
+def test_handle_incoming_message_sends_error_message(client, auth, monkeypatch):
+    """Test whether exceptions during generation are returned as error message."""
+
+    class EmitRecorder:
+        """Helper class to record function call to emit()."""
+
+        text = None
+        status = None
+
+    def fake_emit(_event, _arg):
+        EmitRecorder.text = _arg["text"]
+        EmitRecorder.status = _arg["status"]
+
+    def fake_reply(_ai_id, _input_text, _knowledge_id):
+        raise NotImplementedError("Test Exception")
+
+    monkeypatch.setattr("backaind.ainteraction.emit", fake_emit)
+    monkeypatch.setattr("backaind.ainteraction.reply", fake_reply)
+
+    auth.login()
+    with client:
+        client.get("/")
+        handle_incoming_message(test_incoming_message)
+
+    assert EmitRecorder.text == "Test Exception"
+    assert EmitRecorder.status == "error"
+
+
 def test_send_next_token_emits_token(monkeypatch):
     """Test if a call to send_next_token emits the 'token' event."""
 

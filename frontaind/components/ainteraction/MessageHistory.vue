@@ -5,7 +5,8 @@
     :class="message.author.species === 'ai' && 'bg-light'"
     :key="message.id"
   >
-    <div class="card-body" :class="message.status === 'writing' && 'writing'">
+    <div class="card-body" :class="message.status">
+      <span class="d-none badge text-bg-danger error-badge">Error 😩</span>
       {{ message.text }}
     </div>
   </div>
@@ -33,6 +34,10 @@ const { messages } = defineProps<{
   background: var(--ownai-primary);
   display: inline-block;
   animation: blink-animation 1s steps(3, start) infinite;
+}
+
+.error .error-badge {
+  display: inline-block !important;
 }
 
 .card-body {

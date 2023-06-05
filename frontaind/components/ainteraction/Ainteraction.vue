@@ -1,12 +1,12 @@
 <template>
   <AiSelection
-    :ai-definitions="aiDefinitions"
+    :ais="parsedAis"
     :disabled="selectionDisabled"
     @select-ai="selectAi"
   />
   <KnowledgeSelection
     v-if="needsKnowledge"
-    :knowledge-definitions="knowledgeDefinitions"
+    :knowledges="parsedKnowledges"
     :disabled="selectionDisabled"
     @select-knowledge="selectKnowledge"
   />
@@ -24,8 +24,8 @@ import AiSelection from "./AiSelection.vue";
 import KnowledgeSelection from "./KnowledgeSelection.vue";
 import MessageHistory from "./MessageHistory.vue";
 import MessageInput from "./MessageInput.vue";
-import type { AiDefinition } from "@/types/ainteraction/AiDefinition";
-import type { KnowledgeDefinition } from "@/types/ainteraction/KnowledgeDefinition";
+import type { BasicAi } from "@/types/ainteraction/BasicAi";
+import type { BasicKnowledge } from "@/types/ainteraction/BasicKnowledge";
 import type { Message } from "@/types/ainteraction/Message";
 import type { Token } from "@/types/ainteraction/Token";
 
@@ -34,16 +34,16 @@ const { ais, knowledges } = defineProps<{
   knowledges: string;
 }>();
 
-const aiDefinitions: AiDefinition[] = JSON.parse(ais);
-const knowledgeDefinitions: KnowledgeDefinition[] = JSON.parse(knowledges);
+const parsedAis: BasicAi[] = JSON.parse(ais);
+const parsedKnowledges: BasicKnowledge[] = JSON.parse(knowledges);
 
-const selectedAi = ref<AiDefinition | null>(null);
-const selectedKnowledge = ref<KnowledgeDefinition | null>(null);
+const selectedAi = ref<BasicAi | null>(null);
+const selectedKnowledge = ref<BasicKnowledge | null>(null);
 
-const selectAi = (ai: AiDefinition) => {
+const selectAi = (ai: BasicAi) => {
   selectedAi.value = ai;
 };
-const selectKnowledge = (knowledge: KnowledgeDefinition) => {
+const selectKnowledge = (knowledge: BasicKnowledge) => {
   selectedKnowledge.value = knowledge;
 };
 

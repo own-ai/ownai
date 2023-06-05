@@ -53,9 +53,12 @@ def handle_incoming_message(message):
     ai_id = message.get("aiId")
     knowledge_id = message.get("knowledgeId")
     message_text = message.get("message", {}).get("text", "")
-    response = reply(ai_id, message_text, knowledge_id)
-
-    send_response(response_id, response)
+    try:
+        response = reply(ai_id, message_text, knowledge_id)
+        send_response(response_id, response)
+    # pylint: disable=broad-exception-caught
+    except Exception as exception:
+        send_response(response_id, str(exception), "error")
 
 
 def init_app(app):
@@ -74,7 +77,7 @@ def send_next_token(response_id: int, token_text: str):
     )
 
 
-def send_response(response_id: int, message_text: str):
+def send_response(response_id: int, message_text: str, status: str = "done"):
     """Send the full response message to the user."""
     emit(
         "message",
@@ -85,6 +88,6 @@ def send_response(response_id: int, message_text: str):
             },
             "date": datetime.now().isoformat(),
             "text": message_text,
-            "status": "done",
+            "status": status,
         },
     )

@@ -10,7 +10,7 @@
     >
       <span class="badge rounded-pill text-bg-primary">AI</span>
     </div>
-    <div v-if="!aiDefinitions.length" class="flex-grow-1">
+    <div v-if="!ais.length" class="flex-grow-1">
       <strong>No AI found. Please set up an AI first.</strong>
     </div>
     <div v-else-if="disabled" class="flex-grow-1">
@@ -26,17 +26,17 @@
         {{ selectedAi ? selectedAi.name : "Select AI" }}
       </button>
       <ul class="dropdown-menu w-100 m-0">
-        <li v-for="aiDefinition in aiDefinitions" :key="aiDefinition.id">
+        <li v-for="ai in ais" :key="ai.id">
           <a
             class="dropdown-item d-flex align-items-center gap-2 py-2"
-            @click="selectAi(aiDefinition)"
+            @click="selectAi(ai)"
           >
             <span
               class="d-inline-block rounded-circle p-1"
-              :class="getAiColor(aiDefinition)"
-              :title="getAiCapabilitiesHint(aiDefinition)"
+              :class="getAiColor(ai)"
+              :title="getAiCapabilitiesHint(ai)"
             ></span>
-            {{ aiDefinition.name }}
+            {{ ai.name }}
           </a>
         </li>
       </ul>
@@ -46,45 +46,45 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import type { AiDefinition } from "@/types/ainteraction/AiDefinition";
+import type { BasicAi } from "@/types/ainteraction/BasicAi";
 
-const { aiDefinitions, disabled } = defineProps<{
-  aiDefinitions: AiDefinition[];
+const { ais, disabled } = defineProps<{
+  ais: BasicAi[];
   disabled: boolean;
 }>();
 
 const emit = defineEmits(["select-ai"]);
-const selectedAi = ref<AiDefinition | null>(null);
+const selectedAi = ref<BasicAi | null>(null);
 
-const selectAi = (aiDefinition: AiDefinition) => {
-  emit("select-ai", aiDefinition);
-  selectedAi.value = aiDefinition;
+const selectAi = (ai: BasicAi) => {
+  emit("select-ai", ai);
+  selectedAi.value = ai;
 };
 
-const usesKnowledge = (aiDefinition: AiDefinition) => {
-  return aiDefinition.input_keys.includes("input_knowledge");
+const usesKnowledge = (ai: BasicAi) => {
+  return ai.input_keys.includes("input_knowledge");
 };
 
 const needsKnowledge = computed(
   () => !!selectedAi.value && usesKnowledge(selectedAi.value)
 );
 
-const getAiColor = (aiDefinition: AiDefinition) => {
-  if (usesKnowledge(aiDefinition)) {
+const getAiColor = (ai: BasicAi) => {
+  if (usesKnowledge(ai)) {
     return "bg-warning";
   }
   return "bg-secondary";
 };
 
-const getAiCapabilitiesHint = (aiDefinition: AiDefinition) => {
-  if (usesKnowledge(aiDefinition)) {
+const getAiCapabilitiesHint = (ai: BasicAi) => {
+  if (usesKnowledge(ai)) {
     return "Understands text input and can access additional knowledge.";
   }
   return "Understands text input.";
 };
 
-if (aiDefinitions.length) {
-  selectAi(aiDefinitions[0]);
+if (ais.length) {
+  selectAi(ais[0]);
 }
 </script>
 

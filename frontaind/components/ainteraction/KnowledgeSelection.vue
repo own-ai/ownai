@@ -3,7 +3,7 @@
     <div class="col-sm-2 col-lg-1 d-flex justify-content-end">
       <span class="badge rounded-pill text-bg-warning">Knowledge</span>
     </div>
-    <div v-if="!knowledgeDefinitions.length" class="flex-grow-1">
+    <div v-if="!knowledges.length" class="flex-grow-1">
       <strong
         >This AI accesses knowledge. Please set up knowledge first.</strong
       >
@@ -21,15 +21,12 @@
         {{ selectedKnowledge ? selectedKnowledge.name : "Select Knowledge" }}
       </button>
       <ul class="dropdown-menu w-100 m-0">
-        <li
-          v-for="knowledgeDefinition in knowledgeDefinitions"
-          :key="knowledgeDefinition.id"
-        >
+        <li v-for="knowledge in knowledges" :key="knowledge.id">
           <a
             class="dropdown-item d-flex align-items-center gap-2 py-2"
-            @click="selectKnowledge(knowledgeDefinition)"
+            @click="selectKnowledge(knowledge)"
           >
-            {{ knowledgeDefinition.name }}
+            {{ knowledge.name }}
           </a>
         </li>
       </ul>
@@ -39,23 +36,23 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import type { KnowledgeDefinition } from "@/types/ainteraction/KnowledgeDefinition";
+import type { BasicKnowledge } from "@/types/ainteraction/BasicKnowledge";
 
-const { knowledgeDefinitions, disabled } = defineProps<{
-  knowledgeDefinitions: KnowledgeDefinition[];
+const { knowledges, disabled } = defineProps<{
+  knowledges: BasicKnowledge[];
   disabled: boolean;
 }>();
 
 const emit = defineEmits(["select-knowledge"]);
-const selectedKnowledge = ref<KnowledgeDefinition | null>(null);
+const selectedKnowledge = ref<BasicKnowledge | null>(null);
 
-const selectKnowledge = (knowledgeDefinition: KnowledgeDefinition) => {
-  emit("select-knowledge", knowledgeDefinition);
-  selectedKnowledge.value = knowledgeDefinition;
+const selectKnowledge = (knowledge: BasicKnowledge) => {
+  emit("select-knowledge", knowledge);
+  selectedKnowledge.value = knowledge;
 };
 
-if (knowledgeDefinitions.length) {
-  selectKnowledge(knowledgeDefinitions[0]);
+if (knowledges.length) {
+  selectKnowledge(knowledges[0]);
 }
 </script>
 
