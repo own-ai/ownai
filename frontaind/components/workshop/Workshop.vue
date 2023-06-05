@@ -45,9 +45,12 @@
       </div>
       <div class="offcanvas-body p-0 border-top h-100 overflow-auto">
         <div
-          class="d-flex flex-column align-items-stretch flex-shrink-0 bg-body-tertiary overflow-auto w-100"
+          class="d-flex flex-column align-items-stretch flex-shrink-0 bg-body-tertiary overflow-auto h-100 w-100"
         >
-          <div class="list-group list-group-flush border-bottom scrollarea">
+          <div
+            v-if="items?.length"
+            class="list-group list-group-flush border-bottom scrollarea"
+          >
             <a
               v-for="item in items"
               :key="item.id"
@@ -80,6 +83,12 @@
                 </div>
               </div>
             </a>
+          </div>
+          <div
+            v-else
+            class="d-flex flex-column h-100 w-100 align-items-center justify-content-center mt-3"
+          >
+            <slot name="list-empty"></slot>
           </div>
         </div>
       </div>

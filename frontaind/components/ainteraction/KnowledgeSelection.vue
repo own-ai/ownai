@@ -5,7 +5,8 @@
     </div>
     <div v-if="!knowledges.length" class="flex-grow-1">
       <strong
-        >This AI accesses knowledge. Please set up knowledge first.</strong
+        >This AI accesses knowledge. Please
+        <a href="/workshop/knowledge">set up knowledge</a> first.</strong
       >
     </div>
     <div v-else-if="disabled" class="flex-grow-1">

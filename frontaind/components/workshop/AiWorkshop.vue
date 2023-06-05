@@ -51,6 +51,10 @@
         </a>
       </li>
     </template>
+    <template v-slot:list-empty>
+      No AI set up yet.
+      <NewAiDropdown class="m-3" @load="loadFile" @create="newEmpty" />
+    </template>
     <div ref="codemirrorRef" class="overflow-auto w-100"></div>
   </Workshop>
 </template>

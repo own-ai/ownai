@@ -11,7 +11,10 @@
       <span class="badge rounded-pill text-bg-primary">AI</span>
     </div>
     <div v-if="!ais.length" class="flex-grow-1">
-      <strong>No AI found. Please set up an AI first.</strong>
+      <strong
+        >No AI found. Please
+        <a href="/workshop/ai">set up an AI</a> first.</strong
+      >
     </div>
     <div v-else-if="disabled" class="flex-grow-1">
       <strong>{{ selectedAi?.name }}</strong>
