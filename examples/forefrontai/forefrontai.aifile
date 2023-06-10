@@ -1,0 +1,30 @@
+{
+  "name": "Your Model @ForefrontAI",
+  "aifileversion": 1,
+  "chain": {
+    "memory": null,
+    "verbose": false,
+    "prompt": {
+      "input_variables": [
+        "input_text"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "Question: {input_text}\nAnswer:",
+      "template_format": "f-string",
+      "validate_template": true,
+      "_type": "prompt"
+    },
+    "llm": {
+      "endpoint_url": "your-endpoint-url",
+      "temperature": 0.7,
+      "length": 256,
+      "top_p": 1.0,
+      "top_k": 40,
+      "repetition_penalty": 1,
+      "_type": "forefrontai"
+    },
+    "output_key": "output_text",
+    "_type": "llm_chain"
+  }
+}

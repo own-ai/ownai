@@ -1,0 +1,26 @@
+{
+  "name": "Your Model @Banana",
+  "aifileversion": 1,
+  "chain": {
+    "memory": null,
+    "verbose": false,
+    "prompt": {
+      "input_variables": [
+        "input_text"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "Question: {input_text}\nAnswer:",
+      "template_format": "f-string",
+      "validate_template": true,
+      "_type": "prompt"
+    },
+    "llm": {
+      "model_key": "your-model-key",
+      "model_kwargs": {},
+      "_type": "bananadev"
+    },
+    "output_key": "output_text",
+    "_type": "llm_chain"
+  }
+}

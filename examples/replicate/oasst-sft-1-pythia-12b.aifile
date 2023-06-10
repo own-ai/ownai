@@ -1,0 +1,26 @@
+{
+  "name": "oasst-sft-1-pythia-12b @Replicate",
+  "aifileversion": 1,
+  "chain": {
+    "memory": null,
+    "verbose": false,
+    "prompt": {
+      "input_variables": [
+        "input_text"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "<|prompter|>{input_text}<|endoftext|><|assistant|>",
+      "template_format": "f-string",
+      "validate_template": true,
+      "_type": "prompt"
+    },
+    "llm": {
+      "model": "replicate/oasst-sft-1-pythia-12b:28d1875590308642710f46489b97632c0df55adb5078d43064e1dc0bf68117c3",
+      "model_kwargs": {},
+      "_type": "replicate"
+    },
+    "output_key": "output_text",
+    "_type": "llm_chain"
+  }
+}

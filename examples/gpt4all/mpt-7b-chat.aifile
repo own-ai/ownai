@@ -1,0 +1,35 @@
+{
+  "name": "mpt-7b-chat",
+  "aifileversion": 1,
+  "chain": {
+    "memory": null,
+    "verbose": false,
+    "prompt": {
+      "input_variables": [
+        "input_text"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "Question: {input_text}\nAnswer:",
+      "template_format": "f-string",
+      "validate_template": true,
+      "_type": "prompt"
+    },
+    "llm": {
+      "model": "ggml-mpt-7b-chat.bin",
+      "allow_download": true,
+      "n_ctx": 512,
+      "n_predict": 256,
+      "top_k": 40,
+      "top_p": 0.95,
+      "temp": 0.8,
+      "n_batch": 1,
+      "repeat_penalty": 1.3,
+      "repeat_last_n": 64,
+      "context_erase": 0.5,
+      "_type": "gpt4all"
+    },
+    "output_key": "output_text",
+    "_type": "llm_chain"
+  }
+}

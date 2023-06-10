@@ -1,0 +1,33 @@
+{
+  "name": "llama-7b",
+  "aifileversion": 1,
+  "chain": {
+    "memory": null,
+    "verbose": false,
+    "prompt": {
+      "input_variables": [
+        "input_text"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "Question: {input_text}\nAnswer:",
+      "template_format": "f-string",
+      "validate_template": true,
+      "_type": "prompt"
+    },
+    "llm": {
+      "model_path": "./instance/llama-7b.ggmlv3.q4_0.bin",
+      "suffix": null,
+      "max_tokens": 256,
+      "temperature": 0.8,
+      "top_p": 0.95,
+      "logprobs": null,
+      "echo": false,
+      "repeat_penalty": 1.1,
+      "top_k": 40,
+      "_type": "llamacpp"
+    },
+    "output_key": "output_text",
+    "_type": "llm_chain"
+  }
+}

@@ -1,22 +1,40 @@
-# Non-pinned top-level dependencies to set up a dev environment for ownAI
+# Non-pinned top-level dependencies to set up an environment for ownAI
 
-# "Must-have" dependencies (see setup.py -> install_requires)
+# Required dependencies (see setup.py -> install_requires)
 flask
 flask-socketio
 langchain
 
-# If you want to use knowledge
+# Required if you want to use knowledge
 chromadb
 sentence_transformers
 
-# Document loaders for knowledge
+# Optional document loaders for knowledge
+# (you only need the packages for the file formats you want to use)
 docx2txt
 pypdf
 
-# Only needed if you want to use these services
+# Optional packages to run LLMs or connect to LLM providers
+# (you only need the packages for LLMs or services you want to use)
+aleph_alpha_client
+banana-dev
+beam-sdk
+boto3 # for AWS / SageMaker
+cohere
+ctransformers
+google-cloud-aiplatform # for VertexAI
+google-generativeai
+gpt4all
 huggingface_hub
+llama-cpp-python
+nlpcloud
+openai
+replicate
+rwkv
+text_generation # for HuggingFaceTextGenInference
+transformers # for HuggingFacePipeline
 
-# Dev-Dependencies
+# Optional dependencies for development
 -e .
 python-dotenv
 pylint

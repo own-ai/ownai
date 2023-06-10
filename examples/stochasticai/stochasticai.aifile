@@ -1,0 +1,28 @@
+{
+  "name": "Your Model @StochasticAI",
+  "aifileversion": 1,
+  "chain": {
+    "memory": null,
+    "verbose": false,
+    "prompt": {
+      "input_variables": [
+        "input_text"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "Question: {input_text}\nAnswer:",
+      "template_format": "f-string",
+      "validate_template": true,
+      "_type": "prompt"
+    },
+    "llm": {
+      "endpoint_url": "your-api-url",
+      "model_kwargs": {
+        "endpoint_url": "your-api-url"
+      },
+      "_type": "stochasticai"
+    },
+    "output_key": "output_text",
+    "_type": "llm_chain"
+  }
+}

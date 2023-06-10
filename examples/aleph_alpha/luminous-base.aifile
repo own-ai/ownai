@@ -1,0 +1,56 @@
+{
+  "name": "luminous-base @Aleph Alpha",
+  "aifileversion": 1,
+  "chain": {
+    "memory": null,
+    "verbose": false,
+    "prompt": {
+      "input_variables": [
+        "input_text"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "Q: {input_text}\nA:",
+      "template_format": "f-string",
+      "validate_template": true,
+      "_type": "prompt"
+    },
+    "llm": {
+      "model": "luminous-base",
+      "maximum_tokens": 64,
+      "temperature": 0.0,
+      "top_k": 0,
+      "top_p": 0.0,
+      "presence_penalty": 0.0,
+      "frequency_penalty": 0.0,
+      "n": 1,
+      "repetition_penalties_include_prompt": false,
+      "use_multiplicative_presence_penalty": false,
+      "penalty_bias": null,
+      "penalty_exceptions": null,
+      "penalty_exceptions_include_stop_sequences": null,
+      "best_of": null,
+      "logit_bias": null,
+      "log_probs": null,
+      "tokens": false,
+      "disable_optimizations": false,
+      "minimum_tokens": 0,
+      "echo": false,
+      "use_multiplicative_frequency_penalty": false,
+      "sequence_penalty": 0.0,
+      "sequence_penalty_min_length": 2,
+      "use_multiplicative_sequence_penalty": false,
+      "completion_bias_inclusion": null,
+      "completion_bias_inclusion_first_token_only": false,
+      "completion_bias_exclusion": null,
+      "completion_bias_exclusion_first_token_only": false,
+      "contextual_control_threshold": null,
+      "control_log_additive": true,
+      "repetition_penalties_include_completion": true,
+      "raw_completion": false,
+      "_type": "aleph_alpha"
+    },
+    "output_key": "output_text",
+    "_type": "llm_chain"
+  }
+}

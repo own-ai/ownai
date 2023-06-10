@@ -1,0 +1,28 @@
+{
+  "name": "mpt-7b-instruct @MosaicML",
+  "aifileversion": 1,
+  "chain": {
+    "memory": null,
+    "verbose": false,
+    "prompt": {
+      "input_variables": [
+        "input_text"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "Question: {input_text}",
+      "template_format": "f-string",
+      "validate_template": true,
+      "_type": "prompt"
+    },
+    "llm": {
+      "endpoint_url": "https://models.hosted-on.mosaicml.hosting/mpt-7b-instruct/v1/predict",
+      "model_kwargs": {
+        "do_sample": false
+      },
+      "_type": "mosaic"
+    },
+    "output_key": "output_text",
+    "_type": "llm_chain"
+  }
+}

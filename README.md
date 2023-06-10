@@ -2,22 +2,23 @@
 
 With ownAI you can run your own AIs.
 
-ownAI is an open-source platform written in Python using the Flask framework. It allows you to host and manage AI applications with a web interface for interaction. ownAI supports fine-tuning AI models for specific use-cases and provides a flexible environment for your AI projects.
+ownAI is an open-source platform written in Python using the Flask framework. It allows you to host and manage AI applications with a web interface for interaction. ownAI supports the customization of AIs for specific use cases and provides a flexible environment for your AI projects.
 
 ## Table of Contents
 
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Fine-tuning Models](#fine-tuning-models)
+- [AI files](#ai-files)
 - [Contributing](#contributing)
 - [License](#license)
 
 ## Features
 
-- Host and manage AI applications with ease
+- Host and manage AI applications
 - Web-based interface for interacting with AI models
-- Support for model fine-tuning to suit specific needs
+- Support for AI customization to suit specific needs
+- Create and manage additional knowledge for AIs
 - Open-source and community-driven
 
 ## Installation
@@ -73,33 +74,31 @@ Now, you should be able to access the ownAI web interface at `http://localhost:5
 
 ## Usage
 
-To interact with the ownAI server, visit the web interface at `http://localhost:5000` and follow these steps:
+To start interacting with your own AI, visit the web interface at `http://localhost:5000` and follow these steps:
 
-1. Select an AI model from the dropdown menu.
+1. Log in using the credentials you set up during installation.
 
-2. Enter your input text or data in the provided input box.
+2. Click on the ownAI logo in the upper left corner to open the main menu.
 
-3. Click the "Submit" button to process your input with the selected AI model.
+3. Choose "AI Workshop" and click the "New AI" button.
 
-4. The AI model's response will be displayed in the output section.
+4. Load an Aifile (see [below](#ai-files) for details and in the [examples directory](./examples) for examples).
 
-## Fine-tuning Models
+5. Optionally customize the AI to suit your needs.
 
-ownAI supports fine-tuning AI models for specific use-cases. To fine-tune a model, follow these steps:
+6. Optionally select "Knowledge" from the main menu to upload additional knowledge (if your AI chain supports it).
 
-1. Prepare your training data in the required format.
+7. Select "Interaction" from the main menu and enter your input text or data in the provided input box.
 
-2. Configure the fine-tuning settings in the `instance/config.py` file.
+## AI files
 
-3. Run the fine-tuning script:
+ownAI uses `.aifile` files to store and load the specification and configuration of AIs.
+In the [examples directory](./examples) you can find many different examples to run various AI models locally or to use external providers.
 
-```
-python finetune.py
-```
+Please also refer to the [readme file](./examples/README.md) in the examples directory.
 
-4. Monitor the training process and evaluate the results.
-
-5. Once the fine-tuning is complete, the new model will be available for use in the web interface.
+If you want to get started quickly and run your AIs by yourself, please have a look at the `ctransformers`, `gpt4all` and `huggingface_pipeline` examples.
+These allow you to run your own AIs on your machine with little or no further setup.
 
 ## Contributing
 

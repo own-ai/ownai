@@ -1,0 +1,41 @@
+{
+  "name": "GPT2 @Beam",
+  "aifileversion": 1,
+  "chain": {
+    "memory": null,
+    "verbose": false,
+    "prompt": {
+      "input_variables": [
+        "input_text"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "Question: {input_text}\nAnswer:",
+      "template_format": "f-string",
+      "validate_template": true,
+      "_type": "prompt"
+    },
+    "llm": {
+      "model_name": "gpt2",
+      "name": "gpt2",
+      "cpu": "8",
+      "memory": "32Gi",
+      "gpu": "A10G",
+      "python_version": "python3.8",
+      "python_packages": [
+        "diffusers[torch]>=0.10",
+        "transformers",
+        "torch",
+        "pillow",
+        "accelerate",
+        "safetensors",
+        "xformers"
+      ],
+      "max_length": "50",
+      "model_kwargs": {},
+      "_type": "beam"
+    },
+    "output_key": "output_text",
+    "_type": "llm_chain"
+  }
+}

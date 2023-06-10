@@ -1,0 +1,33 @@
+{
+  "name": "RWKV 1.5B",
+  "aifileversion": 1,
+  "chain": {
+    "memory": null,
+    "verbose": false,
+    "prompt": {
+      "input_variables": [
+        "input_text"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "Bob: {input_text}\n\nAlice:",
+      "template_format": "f-string",
+      "validate_template": true,
+      "_type": "prompt"
+    },
+    "llm": {
+      "model": "./instance/RWKV-4-Raven-1B5-v9-Eng99%-Other1%-20230411-ctx4096.pth",
+      "tokens_path": "./instance/20B_tokenizer.json",
+      "verbose": false,
+      "top_p": 0.5,
+      "temperature": 1.0,
+      "penalty_alpha_frequency": 0.4,
+      "penalty_alpha_presence": 0.4,
+      "CHUNK_LEN": 256,
+      "max_tokens_per_generation": 256,
+      "_type": "rwkv"
+    },
+    "output_key": "output_text",
+    "_type": "llm_chain"
+  }
+}

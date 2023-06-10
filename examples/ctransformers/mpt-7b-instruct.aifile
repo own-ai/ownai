@@ -1,0 +1,28 @@
+{
+  "name": "MPT-7B-Instruct",
+  "aifileversion": 1,
+  "chain": {
+    "memory": null,
+    "verbose": false,
+    "prompt": {
+      "input_variables": [
+        "input_text"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "Question: {input_text}\nAnswer:",
+      "template_format": "f-string",
+      "validate_template": true,
+      "_type": "prompt"
+    },
+    "llm": {
+      "model": "rustformers/mpt-7b-ggml",
+      "model_type": "mpt",
+      "model_file": "mpt-7b-instruct-q4_0.bin",
+      "config": null,
+      "_type": "ctransformers"
+    },
+    "output_key": "output_text",
+    "_type": "llm_chain"
+  }
+}
