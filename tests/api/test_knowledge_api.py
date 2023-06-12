@@ -4,7 +4,11 @@ import json
 import shutil
 import pytest
 from backaind.db import get_db
-from backaind.knowledge import get_knowledge_entry_from_db, get_knowledge
+from backaind.knowledge import (
+    get_knowledge_entry_from_db,
+    get_knowledge,
+    reset_global_knowledge,
+)
 
 
 def test_auth_required(client):
@@ -112,6 +116,7 @@ def test_upload_txt(client, auth):
         knowledge = get_knowledge(1)
         results = knowledge.similarity_search("txt")
         assert results.pop().page_content == "This is a txt test file."
+        reset_global_knowledge()
 
 
 def test_upload_pdf(client, auth):
@@ -127,6 +132,7 @@ def test_upload_pdf(client, auth):
         knowledge = get_knowledge(1)
         results = knowledge.similarity_search("pdf")
         assert results.pop().page_content == "This is a pdf test file."
+        reset_global_knowledge()
 
 
 def test_upload_docx(client, auth):
@@ -142,6 +148,7 @@ def test_upload_docx(client, auth):
         knowledge = get_knowledge(1)
         results = knowledge.similarity_search("docx")
         assert results.pop().page_content == "This is a docx test file."
+        reset_global_knowledge()
 
 
 def test_upload_no_file_fails(client, auth):

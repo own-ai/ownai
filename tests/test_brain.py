@@ -1,38 +1,34 @@
 """Test the handling of AI chains."""
-from flask import session
-
-from backaind.brain import get_chain, reply
-
-
-def test_get_chain_returns_from_session(client):
-    """Test if the chain is loaded from session."""
-    with client:
-        client.get("/")
-        session["chain[1]"] = "NotARealChain"
-        session["chain_input_keys[1]"] = set("text_input")
-        (chain, chain_input_keys) = get_chain(1)
-        assert chain == "NotARealChain"
-        assert chain_input_keys == set("text_input")
+from backaind.brain import get_chain, reply, reset_global_chain
+import backaind.brain
 
 
-def test_get_chain_creates_new_chain_if_not_in_session(client, monkeypatch):
+def test_get_chain_loads_from_global_chain():
+    """Test if the chain is loaded from the global chain instance."""
+    backaind.brain.global_chain = "NotARealChain"
+    backaind.brain.global_chain_id = 1
+    backaind.brain.global_chain_input_keys = set("text_input")
+    (chain, chain_input_keys) = get_chain(1)
+    assert chain == "NotARealChain"
+    assert chain_input_keys == set("text_input")
+    reset_global_chain()
+
+
+def test_get_chain_creates_new_chain(monkeypatch):
     """Test if the chain gets created if it doesn't exist yet."""
-    with client:
-        client.get("/")
-        session["chain[1]"] = None
-        monkeypatch.setattr(
-            "backaind.brain.get_aifile_from_db",
-            lambda _ai_id: {
-                "input_keys": '["input_text"]',
-                "chain": '{"name": "NotARealChain"}',
-            },
-        )
-        monkeypatch.setattr(
-            "backaind.brain.load_chain_from_config", lambda chain: chain
-        )
-        (chain, _chain_input_keys) = get_chain(1)
-        assert chain == {"name": "NotARealChain"}
-        assert session["chain[1]"] == {"name": "NotARealChain"}
+    reset_global_chain()
+    monkeypatch.setattr(
+        "backaind.brain.get_aifile_from_db",
+        lambda _ai_id: {
+            "input_keys": '["input_text"]',
+            "chain": '{"name": "NotARealChain"}',
+        },
+    )
+    monkeypatch.setattr("backaind.brain.load_chain_from_config", lambda chain: chain)
+    (chain, _chain_input_keys) = get_chain(1)
+    assert chain == {"name": "NotARealChain"}
+    assert backaind.brain.global_chain == {"name": "NotARealChain"}
+    reset_global_chain()
 
 
 def test_reply_runs_the_chain(monkeypatch):

@@ -3,6 +3,7 @@ import json
 from flask import Blueprint, jsonify, request, make_response, abort
 from backaind.aifile import get_all_aifiles_from_db, get_aifile_from_db
 from backaind.auth import login_required
+from backaind.brain import reset_global_chain
 from backaind.db import get_db
 
 bp = Blueprint("api-ai", __name__, url_prefix="/api/ai")
@@ -115,6 +116,7 @@ def update_ai(ai_id):
         (name, input_keys, chain, ai_id),
     )
     database.commit()
+    reset_global_chain(ai_id)
     return jsonify(
         {
             "id": ai_id,
@@ -132,4 +134,5 @@ def delete_ai(ai_id):
     database = get_db()
     database.execute("DELETE FROM ai WHERE id = ?", (ai_id,))
     database.commit()
+    reset_global_chain(ai_id)
     return ("", 204)

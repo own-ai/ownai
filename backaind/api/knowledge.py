@@ -12,6 +12,7 @@ from backaind.knowledge import (
     add_to_knowledge,
     get_all_knowledge_entries_from_db,
     get_knowledge_entry_from_db,
+    reset_global_knowledge,
 )
 
 bp = Blueprint("api-knowledge", __name__, url_prefix="/api/knowledge")
@@ -137,6 +138,7 @@ def update_knowledge(knowledge_id):
         (name, chunk_size, knowledge_id),
     )
     database.commit()
+    reset_global_knowledge(knowledge_id)
     return jsonify(
         {
             "id": knowledge_id,
@@ -156,6 +158,7 @@ def delete_knowledge(knowledge_id):
     database.execute("DELETE FROM knowledge WHERE id = ?", (knowledge_id,))
     database.commit()
     shutil.rmtree(persist_directory)
+    reset_global_knowledge(knowledge_id)
     return ("", 204)
 
 

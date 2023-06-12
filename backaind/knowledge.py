@@ -3,13 +3,19 @@
     Currently only Chroma is supported as vector store.
 """
 from typing import List
+from threading import Lock
 import click
-from flask import session
 from langchain.docstore.document import Document
 from langchain.embeddings.base import Embeddings
 from langchain.vectorstores.base import VectorStore
 from langchain.vectorstores import Chroma
 from backaind.db import get_db
+
+# pylint: disable=invalid-name
+global_knowledge = None
+global_knowledge_id = None
+# pylint: enable=invalid-name
+knowledge_lock = Lock()
 
 
 class KnowledgeConfigError(Exception):
@@ -29,15 +35,32 @@ def get_embeddings(embeddings_type: str) -> Embeddings:
 
 def get_knowledge(knowledge_id: int) -> VectorStore:
     """Return a vector store instance to be used for knowledge access."""
-    knowledge = session.get(f"knowledge[{knowledge_id}]")
-    if not knowledge:
-        knowledge_entry = get_knowledge_entry_from_db(knowledge_id)
-        knowledge = Chroma(
-            persist_directory=knowledge_entry["persist_directory"],
-            embedding_function=get_embeddings(knowledge_entry["embeddings"]),
-        )
-        session[f"knowledge[{knowledge_id}]"] = knowledge
+    # pylint: disable=global-statement
+    global global_knowledge, global_knowledge_id
+    with knowledge_lock:
+        knowledge = global_knowledge
+        if not knowledge or global_knowledge_id != knowledge_id:
+            knowledge_entry = get_knowledge_entry_from_db(knowledge_id)
+            knowledge = Chroma(
+                persist_directory=knowledge_entry["persist_directory"],
+                embedding_function=get_embeddings(knowledge_entry["embeddings"]),
+            )
+            global_knowledge = knowledge
+            global_knowledge_id = knowledge_id
     return knowledge
+
+
+def reset_global_knowledge(knowledge_id=None):
+    """
+    Drop the global knowledge instance.
+    If knowledge_id is set, it only drops the global knowledge instance if it matches this ID.
+    """
+    # pylint: disable=global-statement
+    global global_knowledge, global_knowledge_id
+    with knowledge_lock:
+        if not knowledge_id or knowledge_id == global_knowledge_id:
+            global_knowledge = None
+            global_knowledge_id = None
 
 
 def add_to_knowledge(knowledge_id: int, documents: List[Document]):
@@ -107,6 +130,7 @@ def add_knowledge(name, embeddings, chunk_size, persist_directory):
             (embeddings, chunk_size, persist_directory, name),
         )
         database.commit()
+        reset_global_knowledge()
         click.echo(f"Updated {name}. Thank you for making me smarter!")
 
 

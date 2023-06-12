@@ -1,5 +1,4 @@
 """Test access to the vector store."""
-from flask import session
 import pytest
 from langchain.docstore.document import Document
 from langchain.embeddings.base import Embeddings
@@ -12,8 +11,10 @@ from backaind.knowledge import (
     get_knowledge,
     get_all_knowledge_entries_from_db,
     get_knowledge_entry_from_db,
+    reset_global_knowledge,
     KnowledgeConfigError,
 )
+import backaind.knowledge
 
 
 def test_get_embeddings_raises_on_unknown_embeddings(client):
@@ -42,13 +43,13 @@ def test_get_knowledge_returns_vector_store(client):
         assert isinstance(knowledge, VectorStore)
 
 
-def test_get_knowledge_returns_from_session(client):
-    """Test if get_knowledge() caches the instance in session."""
-    with client:
-        client.get("/")
-        session["knowledge[1]"] = "NotRealKnowledge"
-        knowledge = get_knowledge(1)
-        assert knowledge == "NotRealKnowledge"
+def test_get_knowledge_loads_from_global_knowledge():
+    """Test if get_knowledge() loads from the global knowledge instance."""
+    backaind.knowledge.global_knowledge = "NotRealKnowledge"
+    backaind.knowledge.global_knowledge_id = 1
+    knowledge = get_knowledge(1)
+    assert knowledge == "NotRealKnowledge"
+    reset_global_knowledge()
 
 
 def test_add_to_knowledge_adds_documents(client):
@@ -61,6 +62,7 @@ def test_add_to_knowledge_adds_documents(client):
         knowledge = get_knowledge(1)
         results = knowledge.similarity_search("Test Document")
         assert results.pop().page_content == "Test Document"
+        reset_global_knowledge()
 
 
 def test_get_knowledge_entry_from_db_returns_entry(app):
