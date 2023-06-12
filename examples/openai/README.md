@@ -7,6 +7,7 @@ The examples in this directory show how to connect ownAI with openAI. ownAI uses
 ## Set up
 
 To use these AIs, you should set the environment variable `OPENAI_API_KEY` with your API key (e.g. in your server's `.env` file).
+Then download the aifile and load it with ownAI (in ownAI, click on the logo in the upper left corner to open the menu, then select "AI Workshop", then "New AI" and "Load Aifile").
 
 ## Privacy
 

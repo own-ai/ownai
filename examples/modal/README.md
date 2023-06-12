@@ -4,6 +4,8 @@
 
 ## Set up
 
+To use these AIs, please download the aifile and load it with ownAI (in ownAI, click on the logo in the upper left corner to open the menu, then select "AI Workshop", then "New AI" and "Load Aifile").
+
 Edit the aifile and adjust the `endpoint_url`.
 
 ## Privacy

@@ -97,7 +97,7 @@ In the [examples directory](./examples) you can find many different examples to 
 
 Please also refer to the [readme file](./examples/README.md) in the examples directory.
 
-If you want to get started quickly and run your AIs by yourself, please have a look at the `ctransformers`, `gpt4all` and `huggingface_pipeline` examples.
+If you want to get started quickly and run your AIs by yourself, please have a look at the [ctransformers](./examples/ctransformers/), [gpt4all](./examples/gpt4all/) and [huggingface_pipeline](./examples/huggingface_pipeline/) examples.
 These allow you to run your own AIs on your machine with little or no further setup.
 
 ## Contributing

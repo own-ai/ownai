@@ -5,6 +5,7 @@ The [NLP Cloud](https://nlpcloud.io) serves high performance pre-trained or cust
 ## Set up
 
 To use these AIs, you should set the environment variable `NLPCLOUD_API_KEY` with your API key (e.g. in your server's `.env` file).
+Then download the aifile and load it with ownAI (in ownAI, click on the logo in the upper left corner to open the menu, then select "AI Workshop", then "New AI" and "Load Aifile").
 
 ## Privacy
 
