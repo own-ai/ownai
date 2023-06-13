@@ -1,9 +1,10 @@
 """Provide AI data processing capabilities."""
 import json
 from threading import Lock
-from typing import Tuple, Set
+from typing import Optional, Set, Tuple
 from langchain.chains.base import Chain
 from langchain.chains.loading import load_chain_from_config
+from langchain.schema import BaseMemory
 
 from backaind.aifile import get_aifile_from_db
 from backaind.knowledge import get_knowledge
@@ -48,10 +49,20 @@ def reset_global_chain(ai_id=None):
             global_chain_input_keys = None
 
 
-def reply(ai_id: int, input_text: str, knowledge_id: int | None = None) -> str:
+def reply(
+    ai_id: int,
+    input_text: str,
+    knowledge_id: Optional[int] = None,
+    memory: Optional[BaseMemory] = None,
+) -> str:
     """Run the chain with an input message and return the AI output."""
     (chain, chain_input_keys) = get_chain(ai_id)
     inputs = {}
+    has_memory = (
+        memory
+        and "input_history" in chain_input_keys
+        and memory.load_memory_variables({})["history"]
+    )
     for input_key in chain_input_keys:
         if input_key == "input_text":
             inputs["input_text"] = input_text
@@ -60,6 +71,13 @@ def reply(ai_id: int, input_text: str, knowledge_id: int | None = None) -> str:
                 inputs["input_knowledge"] = []
             else:
                 knowledge = get_knowledge(knowledge_id)
-                inputs["input_knowledge"] = knowledge.similarity_search(input_text)
+                inputs["input_knowledge"] = knowledge.similarity_search(
+                    input_text, k=1 if has_memory else 4
+                )
+        elif input_key == "input_history":
+            if memory is None:
+                inputs["input_history"] = ""
+            else:
+                inputs["input_history"] = memory.load_memory_variables({})["history"]
 
     return chain(inputs)["output_text"]

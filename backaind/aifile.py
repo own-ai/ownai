@@ -13,7 +13,7 @@ class InvalidAifileError(Exception):
 def validate_aifile(aifile):
     """Validate an Aifile for required fields and correct version."""
     required_fields = ["name", "aifileversion", "chain"]
-    allowed_input_keys = ["input_text", "input_knowledge"]
+    allowed_input_keys = ["input_text", "input_knowledge", "input_history"]
 
     for field in required_fields:
         if field not in aifile:

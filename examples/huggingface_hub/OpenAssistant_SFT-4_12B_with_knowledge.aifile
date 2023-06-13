@@ -1,55 +1,56 @@
 {
-    "name": "OpenAssistant SFT-4 12B with knowledge @HuggingFace-Hub",
-    "aifileversion": 1,
-    "chain": {
-        "memory": null,
-        "callbacks": null,
-        "callback_manager": null,
-        "verbose": false,
-        "input_key": "input_knowledge",
-        "output_key": "output_text",
-        "llm_chain": {
-            "memory": null,
-            "callbacks": null,
-            "callback_manager": null,
-            "verbose": false,
-            "prompt": {
-                "input_variables": [
-                    "summaries",
-                    "input_text"
-                ],
-                "output_parser": null,
-                "partial_variables": {},
-                "template": "<|prompter|>Please answer this question: {input_text}\nUse the following information:\n{summaries}\n<|endoftext|><|assistant|>",
-                "template_format": "f-string",
-                "validate_template": true,
-                "_type": "prompt"
-            },
-            "llm": {
-                "repo_id": "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5",
-                "task": null,
-                "model_kwargs": {
-                    "max_new_tokens": 200
-                },
-                "_type": "huggingface_hub"
-            },
-            "output_key": "text",
-            "_type": "llm_chain"
+  "name": "OpenAssistant SFT-4 12B with knowledge @HuggingFace-Hub",
+  "aifileversion": 1,
+  "chain": {
+    "_type": "stuff_documents_chain",
+    "callback_manager": null,
+    "callbacks": null,
+    "document_prompt": {
+      "_type": "prompt",
+      "input_variables": [
+        "page_content",
+        "source"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "Context: {page_content}\nSource: {source}",
+      "template_format": "f-string",
+      "validate_template": true
+    },
+    "document_separator": "\n\n",
+    "document_variable_name": "summaries",
+    "input_key": "input_knowledge",
+    "llm_chain": {
+      "_type": "llm_chain",
+      "callback_manager": null,
+      "callbacks": null,
+      "llm": {
+        "_type": "huggingface_hub",
+        "model_kwargs": {
+          "max_new_tokens": 200
         },
-        "document_prompt": {
-            "input_variables": [
-                "page_content",
-                "source"
-            ],
-            "output_parser": null,
-            "partial_variables": {},
-            "template": "Context: {page_content}\nSource: {source}",
-            "template_format": "f-string",
-            "validate_template": true,
-            "_type": "prompt"
-        },
-        "document_variable_name": "summaries",
-        "document_separator": "\n\n",
-        "_type": "stuff_documents_chain"
-    }
+        "repo_id": "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5",
+        "task": null
+      },
+      "memory": null,
+      "output_key": "text",
+      "prompt": {
+        "_type": "prompt",
+        "input_variables": [
+          "summaries",
+          "input_text",
+          "input_history"
+        ],
+        "output_parser": null,
+        "partial_variables": {},
+        "template": "{input_history}\n<|prompter|>Please answer this question: {input_text}\nUse the following information:\n{summaries}\n<|endoftext|><|assistant|>",
+        "template_format": "f-string",
+        "validate_template": true
+      },
+      "verbose": false
+    },
+    "memory": null,
+    "output_key": "output_text",
+    "verbose": false
+  }
 }

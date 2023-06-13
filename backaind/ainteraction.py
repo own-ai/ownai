@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 from flask import Blueprint, render_template, session
 from flask_socketio import emit, disconnect
+from langchain.memory import ConversationBufferWindowMemory
 
 from backaind.aifile import get_all_aifiles_from_db
 from backaind.auth import login_required
@@ -53,8 +54,16 @@ def handle_incoming_message(message):
     ai_id = message.get("aiId")
     knowledge_id = message.get("knowledgeId")
     message_text = message.get("message", {}).get("text", "")
+
+    memory = ConversationBufferWindowMemory(k=3)
+    for history_message in message.get("history", []):
+        if history_message.get("author", {}).get("species") == "ai":
+            memory.chat_memory.add_ai_message(history_message.get("text", ""))
+        else:
+            memory.chat_memory.add_user_message(history_message.get("text", ""))
+
     try:
-        response = reply(ai_id, message_text, knowledge_id)
+        response = reply(ai_id, message_text, knowledge_id, memory)
         send_response(response_id, response)
     # pylint: disable=broad-exception-caught
     except Exception as exception:

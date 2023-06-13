@@ -78,6 +78,7 @@ const sendMessage = (text: string) => {
     },
     date: new Date(),
     text,
+    status: "done",
   };
 
   const aiResponse: Message = {
@@ -90,12 +91,15 @@ const sendMessage = (text: string) => {
     status: "writing",
   };
 
+  const history = messages.value.filter((message) => message.status === "done");
+
   messages.value.push(userMessage, aiResponse);
   socket.emit("message", {
     message: userMessage,
     responseId: aiResponse.id,
     aiId: selectedAi.value?.id,
     knowledgeId: selectedKnowledge.value?.id,
+    history,
   });
 };
 </script>

@@ -6,11 +6,12 @@
     "verbose": false,
     "prompt": {
       "input_variables": [
-        "input_text"
+        "input_text",
+        "input_history"
       ],
       "output_parser": null,
       "partial_variables": {},
-      "template": "<|prompter|>{input_text}<|endoftext|><|assistant|>",
+      "template": "{input_history}\n<|prompter|>{input_text}<|endoftext|><|assistant|>",
       "template_format": "f-string",
       "validate_template": true,
       "_type": "prompt"

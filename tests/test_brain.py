@@ -1,4 +1,5 @@
 """Test the handling of AI chains."""
+from langchain.memory import ConversationBufferWindowMemory
 from backaind.brain import get_chain, reply, reset_global_chain
 import backaind.brain
 
@@ -58,18 +59,19 @@ def test_reply_sets_inputs(monkeypatch):
 
         def __call__(self, inputs):
             """Mock function for calling the chain."""
-            output = (
-                f"text={inputs['input_text']}, knowledge={inputs['input_knowledge']}"
-            )
+            output = f"{inputs['input_text']},{inputs['input_knowledge']},{inputs['input_history']}"
             return {"output_text": output}
 
     def fake_get_chain(_ai_id):
-        return (FakeChain(), {"input_text", "input_knowledge", "input_unknown"})
+        return (
+            FakeChain(),
+            {"input_text", "input_knowledge", "input_history", "input_unknown"},
+        )
 
     class FakeKnowledge:
         """Helper class for a fake knowledge interface."""
 
-        def similarity_search(self, input_text):
+        def similarity_search(self, input_text, **_kwargs):
             """Mock function to check if the similarity_search is called."""
             return [input_text]
 
@@ -80,7 +82,13 @@ def test_reply_sets_inputs(monkeypatch):
     monkeypatch.setattr("backaind.brain.get_knowledge", fake_get_knowledge)
 
     response = reply(1, "Hi", 1)
-    assert response == "text=Hi, knowledge=['Hi']"
+    assert response == "Hi,['Hi'],"
 
     response = reply(1, "Hi", None)
-    assert response == "text=Hi, knowledge=[]"
+    assert response == "Hi,[],"
+
+    memory = ConversationBufferWindowMemory(k=3)
+    memory.chat_memory.add_ai_message("Hi user")
+    memory.chat_memory.add_user_message("Hi AI")
+    response = reply(1, "Hi", 1, memory)
+    assert response == "Hi,['Hi'],AI: Hi user\nHuman: Hi AI"

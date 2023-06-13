@@ -26,13 +26,31 @@ def test_index(client, auth):
 test_incoming_message = {
     "responseId": 1,
     "message": {
-        "id": 0,
+        "id": 2,
         "author": {
             "species": "human",
         },
         "date": "2023-04-15T23:53:04.745556",
-        "text": "Hi, how are you?",
+        "text": "Fine and you?",
     },
+    "history": [
+        {
+            "id": 0,
+            "author": {
+                "species": "human",
+            },
+            "date": "2023-04-15T23:53:04.745556",
+            "text": "Hi!",
+        },
+        {
+            "id": 1,
+            "author": {
+                "species": "ai",
+            },
+            "date": "2023-04-15T23:53:04.745556",
+            "text": "Hi, how are you?",
+        },
+    ],
 }
 
 
@@ -88,7 +106,7 @@ def test_handle_incoming_message(client, auth, monkeypatch):
     def fake_emit(_event, _arg):
         EmitRecorder.called = True
 
-    def fake_reply(_ai_id, _input_text, _knowledge_id):
+    def fake_reply(*_args):
         return "Fake response"
 
     monkeypatch.setattr("backaind.ainteraction.disconnect", fake_disconnect)
@@ -117,7 +135,7 @@ def test_handle_incoming_message_sends_error_message(client, auth, monkeypatch):
         EmitRecorder.text = _arg["text"]
         EmitRecorder.status = _arg["status"]
 
-    def fake_reply(_ai_id, _input_text, _knowledge_id):
+    def fake_reply(*_args):
         raise NotImplementedError("Test Exception")
 
     monkeypatch.setattr("backaind.ainteraction.emit", fake_emit)

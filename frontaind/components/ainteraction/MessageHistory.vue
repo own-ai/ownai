@@ -6,8 +6,8 @@
     :key="message.id"
   >
     <div class="card-body" :class="message.status">
-      <span class="d-none badge text-bg-danger error-badge">Error 😩</span>
-      {{ message.text }}
+      <span class="d-none badge text-bg-danger error-badge me-2">Error 😩</span
+      >{{ message.text }}
     </div>
   </div>
 </template>

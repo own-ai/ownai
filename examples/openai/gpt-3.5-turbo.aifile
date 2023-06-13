@@ -17,11 +17,12 @@
     "prompt": {
       "_type": "prompt",
       "input_variables": [
-        "input_text"
+        "input_text",
+        "input_history"
       ],
       "output_parser": null,
       "partial_variables": {},
-      "template": "{input_text}",
+      "template": "{input_history}\n{input_text}",
       "template_format": "f-string",
       "validate_template": true
     },
