@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 from flask import Blueprint, render_template, session
 from flask_socketio import emit, disconnect
+from langchain.callbacks.base import BaseCallbackHandler
 from langchain.memory import ConversationBufferWindowMemory
 
 from backaind.aifile import get_all_aifiles_from_db
@@ -11,6 +12,19 @@ from backaind.brain import reply
 from backaind.knowledge import get_all_knowledge_entries_from_db
 
 bp = Blueprint("ainteraction", __name__)
+
+
+class AinteractionCallbackHandler(BaseCallbackHandler):
+    """Callback handler for events during response generation."""
+
+    def __init__(self, response_id: int) -> None:
+        self.response_id = response_id
+
+    def on_chat_model_start(self, serialized, messages, **kwargs):
+        pass
+
+    def on_llm_new_token(self, token: str, **kwargs) -> None:
+        send_next_token(self.response_id, token)
 
 
 @bp.route("/")
@@ -63,11 +77,18 @@ def handle_incoming_message(message):
             memory.chat_memory.add_user_message(history_message.get("text", ""))
 
     try:
-        response = reply(ai_id, message_text, knowledge_id, memory)
+        response = reply(
+            ai_id,
+            message_text,
+            knowledge_id,
+            memory,
+            [AinteractionCallbackHandler(response_id)],
+        )
         send_response(response_id, response)
     # pylint: disable=broad-exception-caught
     except Exception as exception:
         send_response(response_id, str(exception), "error")
+        raise exception
 
 
 def init_app(app):

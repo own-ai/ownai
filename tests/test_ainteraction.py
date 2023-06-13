@@ -2,6 +2,7 @@
 import pytest
 
 from backaind.ainteraction import (
+    AinteractionCallbackHandler,
     handle_incoming_message,
     send_next_token,
     send_response,
@@ -142,7 +143,7 @@ def test_handle_incoming_message_sends_error_message(client, auth, monkeypatch):
     monkeypatch.setattr("backaind.ainteraction.reply", fake_reply)
 
     auth.login()
-    with client:
+    with client, pytest.raises(NotImplementedError):
         client.get("/")
         handle_incoming_message(test_incoming_message)
 
@@ -182,3 +183,25 @@ def test_send_response_emits_message(monkeypatch):
     send_response(1, "message_text")
 
     assert EmitRecorder.event == "message"
+
+
+def test_callback_handler(monkeypatch):
+    """Test if the callback handler calls send_next_token."""
+    callback_handler = AinteractionCallbackHandler(1)
+    assert callback_handler.on_chat_model_start(None, None) is None
+
+    class SendNextTokenRecorder:
+        """Helper class to record function call to send_next_token()."""
+
+        response_id = None
+        token = None
+
+    def fake_send_next_token(response_id, token):
+        SendNextTokenRecorder.response_id = response_id
+        SendNextTokenRecorder.token = token
+
+    monkeypatch.setattr("backaind.ainteraction.send_next_token", fake_send_next_token)
+    callback_handler.on_llm_new_token("test")
+
+    assert SendNextTokenRecorder.response_id == 1
+    assert SendNextTokenRecorder.token == "test"

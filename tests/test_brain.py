@@ -38,7 +38,7 @@ def test_reply_runs_the_chain(monkeypatch):
     class FakeChain:
         """Helper class to allow calling the chain."""
 
-        def __call__(self, _inputs):
+        def __call__(self, _inputs, **_kwargs):
             """Mock function for calling the chain."""
             return {"output_text": "Response"}
 
@@ -57,7 +57,7 @@ def test_reply_sets_inputs(monkeypatch):
     class FakeChain:
         """Helper class to allow calling the chain."""
 
-        def __call__(self, inputs):
+        def __call__(self, inputs, **_kwargs):
             """Mock function for calling the chain."""
             output = f"{inputs['input_text']},{inputs['input_knowledge']},{inputs['input_history']}"
             return {"output_text": output}

@@ -2,6 +2,7 @@
 import json
 from threading import Lock
 from typing import Optional, Set, Tuple
+from langchain.callbacks.manager import Callbacks
 from langchain.chains.base import Chain
 from langchain.chains.loading import load_chain_from_config
 from langchain.schema import BaseMemory
@@ -54,6 +55,7 @@ def reply(
     input_text: str,
     knowledge_id: Optional[int] = None,
     memory: Optional[BaseMemory] = None,
+    callbacks: Callbacks = None,
 ) -> str:
     """Run the chain with an input message and return the AI output."""
     (chain, chain_input_keys) = get_chain(ai_id)
@@ -79,5 +81,4 @@ def reply(
                 inputs["input_history"] = ""
             else:
                 inputs["input_history"] = memory.load_memory_variables({})["history"]
-
-    return chain(inputs)["output_text"]
+    return chain(inputs, callbacks=callbacks)["output_text"]
