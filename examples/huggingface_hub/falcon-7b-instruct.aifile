@@ -1,0 +1,30 @@
+{
+  "name": "Falcon 7B Instruct @HuggingFace-Hub",
+  "aifileversion": 1,
+  "chain": {
+    "_type": "llm_chain",
+    "llm": {
+      "_type": "huggingface_hub",
+      "model_kwargs": {
+        "max_new_tokens": 200
+      },
+      "repo_id": "tiiuae/falcon-7b-instruct",
+      "task": null
+    },
+    "memory": null,
+    "output_key": "output_text",
+    "prompt": {
+      "_type": "prompt",
+      "input_variables": [
+        "input_text",
+        "input_history"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "{input_history}\nHuman: {input_text}\nAI:",
+      "template_format": "f-string",
+      "validate_template": true
+    },
+    "verbose": false
+  }
+}

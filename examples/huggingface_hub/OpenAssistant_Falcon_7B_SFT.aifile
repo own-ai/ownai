@@ -1,0 +1,30 @@
+{
+  "name": "OpenAssistant Falcon 7B SFT @HuggingFace-Hub",
+  "aifileversion": 1,
+  "chain": {
+    "_type": "llm_chain",
+    "llm": {
+      "_type": "huggingface_hub",
+      "model_kwargs": {
+        "max_new_tokens": 200
+      },
+      "repo_id": "OpenAssistant/falcon-7b-sft-top1-696",
+      "task": null
+    },
+    "memory": null,
+    "output_key": "output_text",
+    "prompt": {
+      "_type": "prompt",
+      "input_variables": [
+        "input_text",
+        "input_history"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "{input_history}\n<|prompter|>{input_text}<|endoftext|><|assistant|>",
+      "template_format": "f-string",
+      "validate_template": true
+    },
+    "verbose": false
+  }
+}

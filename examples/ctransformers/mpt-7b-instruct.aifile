@@ -1,29 +1,35 @@
 {
-  "name": "MPT-7B-Instruct",
+  "name": "MPT 7B Instruct",
   "aifileversion": 1,
   "chain": {
+    "_type": "llm_chain",
+    "llm": {
+      "_type": "ctransformers",
+      "config": {
+        "max_new_tokens": 256,
+        "seed": 42,
+        "temperature": 0.8,
+        "top_k": 40,
+        "top_p": 0.95
+      },
+      "model": "rustformers/mpt-7b-ggml",
+      "model_file": "mpt-7b-instruct-q5_1.bin",
+      "model_type": "mpt"
+    },
     "memory": null,
-    "verbose": false,
+    "output_key": "output_text",
     "prompt": {
+      "_type": "prompt",
       "input_variables": [
         "input_text",
         "input_history"
       ],
       "output_parser": null,
       "partial_variables": {},
-      "template": "{input_history}\nHuman: {input_text}\nAI:",
+      "template": "{input_history}\nBelow is an instruction that describes a task. Write a response that appropriately completes the request.\n### Instruction:\n{input_text}\n### Response:\nAnswer:",
       "template_format": "f-string",
-      "validate_template": true,
-      "_type": "prompt"
+      "validate_template": true
     },
-    "llm": {
-      "model": "rustformers/mpt-7b-ggml",
-      "model_type": "mpt",
-      "model_file": "mpt-7b-instruct-q4_0.bin",
-      "config": null,
-      "_type": "ctransformers"
-    },
-    "output_key": "output_text",
-    "_type": "llm_chain"
+    "verbose": false
   }
 }
