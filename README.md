@@ -100,6 +100,8 @@ Please also refer to the [readme file](./examples/README.md) in the examples dir
 If you want to get started quickly and run your AIs by yourself, please have a look at the [ctransformers](./examples/ctransformers/), [gpt4all](./examples/gpt4all/) and [huggingface_pipeline](./examples/huggingface_pipeline/) examples.
 These allow you to run your own AIs on your machine with little or no further setup.
 
+If you want to create your own aifiles, have a look at the [aifilemaker.py](./aifilemaker.py) script, which you can use as a starting point.
+
 ## Contributing
 
 We welcome contributions from the community. To contribute, please:
