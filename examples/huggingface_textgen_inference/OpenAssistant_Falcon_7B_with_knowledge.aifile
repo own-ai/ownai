@@ -1,5 +1,5 @@
 {
-  "name": "OpenAssistant SFT-4 12B with knowledge @HuggingFace-Hub",
+  "name": "OpenAssistant Falcon 7B with knowledge",
   "aifileversion": 1,
   "chain": {
     "_type": "stuff_documents_chain",
@@ -24,12 +24,15 @@
       "callback_manager": null,
       "callbacks": null,
       "llm": {
-        "_type": "huggingface_hub",
-        "model_kwargs": {
-          "max_new_tokens": 200
-        },
-        "repo_id": "OpenAssistant/oasst-sft-4-pythia-12b-epoch-3.5",
-        "task": null
+        "_type": "huggingface_textgen_inference",
+        "inference_server_url": "your-server-url",
+        "max_new_tokens": 400,
+        "repetition_penalty": 1.03,
+        "stream": true,
+        "temperature": 0.01,
+        "top_k": 10,
+        "top_p": 0.95,
+        "typical_p": 0.95
       },
       "memory": null,
       "output_key": "text",

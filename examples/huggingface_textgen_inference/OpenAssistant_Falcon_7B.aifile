@@ -1,0 +1,33 @@
+{
+  "name": "OpenAssistant Falcon 7B",
+  "aifileversion": 1,
+  "chain": {
+    "_type": "llm_chain",
+    "llm": {
+      "_type": "huggingface_textgen_inference",
+      "inference_server_url": "your-server-url",
+      "max_new_tokens": 512,
+      "repetition_penalty": 1.03,
+      "stream": true,
+      "temperature": 0.01,
+      "top_k": 10,
+      "top_p": 0.95,
+      "typical_p": 0.95
+    },
+    "memory": null,
+    "output_key": "output_text",
+    "prompt": {
+      "_type": "prompt",
+      "input_variables": [
+        "input_text",
+        "input_history"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "{input_history}\n<|prompter|>{input_text}<|endoftext|><|assistant|>",
+      "template_format": "f-string",
+      "validate_template": true
+    },
+    "verbose": false
+  }
+}
