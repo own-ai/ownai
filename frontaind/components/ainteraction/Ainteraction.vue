@@ -10,7 +10,7 @@
     :disabled="selectionDisabled"
     @select-knowledge="selectKnowledge"
   />
-  <MessageHistory :messages="messages" />
+  <MessageHistory :messages="messages" @clear-messages="clearMessages" />
   <MessageInput
     v-if="selectedAi && (!needsKnowledge || selectedKnowledge)"
     @send-message="sendMessage"
@@ -58,6 +58,9 @@ const nextMessageIndex = ref(0);
 const socket = io();
 
 socket.on("token", (incoming: Token) => {
+  if (messages.value.length <= incoming.messageId) {
+    return;
+  }
   const message = messages.value[incoming.messageId];
   messages.value[incoming.messageId] = {
     ...message,
@@ -66,6 +69,9 @@ socket.on("token", (incoming: Token) => {
 });
 
 socket.on("message", (incoming: Message) => {
+  if (messages.value.length <= incoming.id) {
+    return;
+  }
   if (!incoming.text) {
     // Workaround until https://github.com/hwchase17/langchain/pull/6211 is merged
     incoming.text = messages.value[incoming.id].text;
@@ -105,5 +111,11 @@ const sendMessage = (text: string) => {
     knowledgeId: selectedKnowledge.value?.id,
     history,
   });
+};
+
+const clearMessages = () => {
+  messages.value = [];
+  nextMessageIndex.value = 0;
+  selectionDisabled.value = false;
 };
 </script>

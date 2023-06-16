@@ -10,6 +10,11 @@
       >{{ message.text }}
     </div>
   </div>
+  <small v-if="messages.length" class="text-muted">
+    AI responses may contain inaccurate or inappropriate information. Please
+    check the content carefully before using it.
+    <a href="#" @click.prevent="emit('clear-messages')">Clear all messages.</a>
+  </small>
 </template>
 
 <script setup lang="ts">
@@ -18,6 +23,7 @@ import type { Message } from "@/types/ainteraction/Message";
 const { messages } = defineProps<{
   messages: Message[];
 }>();
+const emit = defineEmits(["clear-messages"]);
 </script>
 
 <style scoped>
