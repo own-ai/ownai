@@ -66,6 +66,10 @@ socket.on("token", (incoming: Token) => {
 });
 
 socket.on("message", (incoming: Message) => {
+  if (!incoming.text) {
+    // Workaround until https://github.com/hwchase17/langchain/pull/6211 is merged
+    incoming.text = messages.value[incoming.id].text;
+  }
   messages.value[incoming.id] = incoming;
 });
 
