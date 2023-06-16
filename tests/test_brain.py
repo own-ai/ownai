@@ -1,6 +1,16 @@
 """Test the handling of AI chains."""
+import os
+from langchain.chains.loading import load_chain_from_config
+from langchain.llms.huggingface_text_gen_inference import HuggingFaceTextGenInference
 from langchain.memory import ConversationBufferWindowMemory
-from backaind.brain import get_chain, reply, reset_global_chain
+from backaind.aifile import read_aifile_from_path
+from backaind.brain import (
+    get_chain,
+    reply,
+    reset_global_chain,
+    find_instances,
+    set_text_generation_inference_token,
+)
 import backaind.brain
 
 
@@ -92,3 +102,18 @@ def test_reply_sets_inputs(monkeypatch):
     memory.chat_memory.add_user_message("Hi AI")
     response = reply(1, "Hi", 1, memory)
     assert response == "Hi,['Hi'],AI: Hi user\nHuman: Hi AI"
+
+
+def test_set_text_generation_inference_token():
+    """Test if the text generation inference token is set correctly."""
+    aifile = read_aifile_from_path(
+        "examples/huggingface_textgen_inference/huggingface_textgen_inference.aifile"
+    )
+    chain = load_chain_from_config(aifile["chain"])
+    os.environ["TEXT_GENERATION_INFERENCE_TOKEN"] = "test_token"
+    set_text_generation_inference_token(chain)
+    all_huggingface_instances = find_instances(chain, HuggingFaceTextGenInference)
+    assert len(all_huggingface_instances) == 1
+    assert all_huggingface_instances[0].client.headers == {
+        "Authorization": "Bearer test_token"
+    }

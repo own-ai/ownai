@@ -1,10 +1,12 @@
 """Provide AI data processing capabilities."""
 import json
+import os
 from threading import Lock
 from typing import Optional, Set, Tuple
 from langchain.callbacks.manager import Callbacks
 from langchain.chains.base import Chain
 from langchain.chains.loading import load_chain_from_config
+from langchain.llms.huggingface_text_gen_inference import HuggingFaceTextGenInference
 from langchain.schema import BaseMemory
 
 from backaind.aifile import get_aifile_from_db
@@ -30,6 +32,7 @@ def get_chain(ai_id: int) -> Tuple[Chain, Set[str]]:
             aifile = get_aifile_from_db(ai_id)
             chain_input_keys = json.loads(aifile["input_keys"])
             chain = load_chain_from_config(json.loads(aifile["chain"]))
+            set_text_generation_inference_token(chain)
             global_chain = chain
             global_chain_id = ai_id
             global_chain_input_keys = chain_input_keys
@@ -82,3 +85,27 @@ def reply(
             else:
                 inputs["input_history"] = memory.load_memory_variables({})["history"]
     return chain(inputs, callbacks=callbacks)["output_text"]
+
+
+def find_instances(obj, cls):
+    """Find all instances of a class in an object."""
+    instances = []
+    if isinstance(obj, cls):
+        instances.append(obj)
+    if isinstance(obj, list):
+        for item in obj:
+            instances.extend(find_instances(item, cls))
+    elif hasattr(obj, "__dict__"):
+        for prop in vars(obj).values():
+            instances.extend(find_instances(prop, cls))
+    return instances
+
+
+def set_text_generation_inference_token(chain: Chain):
+    """Set the token for all HuggingFaceTextGenInference instances in the chain."""
+    token = os.environ.get("TEXT_GENERATION_INFERENCE_TOKEN", None)
+    if not token:
+        return
+    all_huggingface_instances = find_instances(chain, HuggingFaceTextGenInference)
+    for instance in all_huggingface_instances:
+        instance.client.headers = {"Authorization": f"Bearer {token}"}
