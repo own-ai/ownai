@@ -58,12 +58,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { throwOnFetchError } from "@/helpers/fetch";
 
-const { knowledgeId } = defineProps<{
+const props = defineProps<{
   knowledgeId: number;
 }>();
+const knowledgeId = ref(props.knowledgeId);
+watch(
+  () => props.knowledgeId,
+  (newVal) => {
+    knowledgeId.value = newVal;
+  }
+);
 
 const isDraggingOver = ref<boolean>(false);
 const isLoading = ref<boolean>(false);
@@ -92,13 +99,22 @@ const handleFiles = async (files: FileList) => {
 
     switch (extension) {
       case "txt":
-        await uploadFile(file, `/api/knowledge/${knowledgeId}/document/txt`);
+        await uploadFile(
+          file,
+          `/api/knowledge/${knowledgeId.value}/document/txt`
+        );
         break;
       case "pdf":
-        await uploadFile(file, `/api/knowledge/${knowledgeId}/document/pdf`);
+        await uploadFile(
+          file,
+          `/api/knowledge/${knowledgeId.value}/document/pdf`
+        );
         break;
       case "docx":
-        await uploadFile(file, `/api/knowledge/${knowledgeId}/document/docx`);
+        await uploadFile(
+          file,
+          `/api/knowledge/${knowledgeId.value}/document/docx`
+        );
         break;
       default:
         isSuccess.value = false;
