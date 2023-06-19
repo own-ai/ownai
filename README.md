@@ -7,7 +7,10 @@ ownAI is an open-source platform written in Python using the Flask framework. It
 ## Table of Contents
 
 - [Features](#features)
+- [Quick start](#quick-start)
 - [Installation](#installation)
+- [Production setup](#production-setup)
+- [Development setup](#development-setup)
 - [Usage](#usage)
 - [AI files](#ai-files)
 - [Contributing](#contributing)
@@ -20,6 +23,17 @@ ownAI is an open-source platform written in Python using the Flask framework. It
 - Support for AI customization to suit specific needs
 - Create and manage additional knowledge for AIs
 - Open-source and community-driven
+
+## Quick start
+
+To get started quickly, clone this repository to your Linux server and execute:
+
+```
+./ownai-server.sh
+```
+
+This will guide you through the installation process and start the server.
+For a detailed installation guide, please refer to the following section.
 
 ## Installation
 
@@ -71,6 +85,35 @@ flask run
 ```
 
 Now, you should be able to access the ownAI web interface at `http://localhost:5000`.
+
+## Production setup
+
+For a production setup, we recommend using a WSGI server such as Gunicorn.
+If you followed the steps above, Gunicorn is already installed in your virtual environment.
+To start the server, run:
+
+```
+gunicorn -b 0.0.0.0:5000 --worker-class geventwebsocket.gunicorn.workers.GeventWebSocketWorker -w 1 "backaind:create_app()"
+```
+
+We recommend using a reverse proxy such as nginx to handle HTTPS.
+
+## Development setup
+
+If you want to contribute to the ownAI frontend, you can set up a development environment as follows:
+
+1. Install Node.js and npm.
+2. Install the frontend dependencies:
+
+```
+npm install
+```
+
+3. Start the development server (this already includes starting the Flask backend server):
+
+```
+npm run dev
+```
 
 ## Usage
 

@@ -41,3 +41,8 @@ pylint
 pytest
 coverage
 black
+
+# Optional dependencies to run as a production server
+gunicorn
+gevent
+gevent-websocket
