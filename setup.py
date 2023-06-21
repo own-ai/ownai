@@ -1,14 +1,14 @@
 """ownAI is an open source platform to run your own AI applications."""
 from pathlib import Path
-from setuptools import find_packages, setup
+from setuptools import find_namespace_packages, setup
 
 setup(
     name="ownAI",
-    version="0.0.0",
+    version="0.1.0",
     description="Run your own AI",
     url="https://ownai.org",
     license="MIT",
-    packages=find_packages(),
+    packages=find_namespace_packages(exclude=["tests", "tests.*", "venv", "venv.*"]),
     include_package_data=True,
     install_requires=[
         "flask",

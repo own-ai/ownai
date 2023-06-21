@@ -41,6 +41,8 @@ pylint
 pytest
 coverage
 black
+build
+twine
 
 # Optional dependencies to run as a production server
 gunicorn
