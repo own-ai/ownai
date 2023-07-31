@@ -84,7 +84,7 @@ def handle_incoming_message(message):
             memory,
             [AinteractionCallbackHandler(response_id)],
         )
-        send_response(response_id, response)
+        send_response(response_id, response.strip())
     # pylint: disable=broad-exception-caught
     except Exception as exception:
         send_response(response_id, str(exception), "error")

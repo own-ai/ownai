@@ -1,0 +1,27 @@
+{
+  "name": "Llama 2 70B @Replicate",
+  "aifileversion": 1,
+  "chain": {
+    "_type": "llm_chain",
+    "llm": {
+      "_type": "replicate",
+      "model": "replicate/llama70b-v2-chat:2d19859030ff705a87c746f7e96eea03aefb71f166725aee39692f1476566d48",
+      "model_kwargs": {}
+    },
+    "memory": null,
+    "output_key": "output_text",
+    "prompt": {
+      "_type": "prompt",
+      "input_variables": [
+        "input_text",
+        "input_history"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "<s>[INST] <<SYS>>\nYou are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.\n\nIf a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\n<</SYS>>\n\n{input_history}</s>\n<s>[INST] {input_text}[/INST]",
+      "template_format": "f-string",
+      "validate_template": true
+    },
+    "verbose": false
+  }
+}

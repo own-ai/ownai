@@ -1,5 +1,5 @@
 {
-  "name": "OpenAssistant Falcon 7B",
+  "name": "Llama 2",
   "aifileversion": 1,
   "chain": {
     "_type": "llm_chain",
@@ -24,7 +24,7 @@
       ],
       "output_parser": null,
       "partial_variables": {},
-      "template": "{input_history}\n<|prompter|>{input_text}<|endoftext|><|assistant|>",
+      "template": "<s>[INST] <<SYS>>\nYou are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.\n\nIf a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\n<</SYS>>\n\n{input_history}</s>\n<s>[INST] {input_text}[/INST]",
       "template_format": "f-string",
       "validate_template": true
     },

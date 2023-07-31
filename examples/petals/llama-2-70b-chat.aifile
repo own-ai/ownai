@@ -1,0 +1,39 @@
+{
+  "name": "Llama 2 70B Chat @Petals",
+  "aifileversion": 1,
+  "chain": {
+    "memory": null,
+    "verbose": false,
+    "tags": null,
+    "metadata": null,
+    "prompt": {
+      "input_variables": [
+        "input_text",
+        "input_history"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "<s>[INST] <<SYS>>\nYou are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.\n\nIf a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\n<</SYS>>\n\n{input_history}</s>\n<s>[INST] {input_text}[/INST]",
+      "template_format": "f-string",
+      "validate_template": true,
+      "_type": "prompt"
+    },
+    "llm": {
+      "model_name": "meta-llama/Llama-2-70b-chat-hf",
+      "temperature": 0.7,
+      "max_new_tokens": 256,
+      "top_p": 0.9,
+      "top_k": null,
+      "do_sample": true,
+      "max_length": null,
+      "_type": "petals"
+    },
+    "output_key": "output_text",
+    "output_parser": {
+      "_type": "default"
+    },
+    "return_final_only": true,
+    "llm_kwargs": {},
+    "_type": "llm_chain"
+  }
+}

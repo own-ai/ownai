@@ -3,7 +3,7 @@ import json
 import os
 from threading import Lock
 from typing import Optional, Set, Tuple
-from langchain.callbacks.manager import Callbacks
+from langchain.callbacks.base import Callbacks
 from langchain.chains.base import Chain
 from langchain.chains.loading import load_chain_from_config
 from langchain.llms.huggingface_text_gen_inference import HuggingFaceTextGenInference

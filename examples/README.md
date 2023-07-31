@@ -50,3 +50,9 @@ Please be aware that large AI models require a lot of resources and cannot be ru
 - [huggingface_textgen_inference](./huggingface_textgen_inference)
 - [llamacpp](./llamacpp)
 - [rwkv](./rwkv)
+
+## Collaborative operation examples
+
+Petals allows you to run large language models collaboratively — you load a small part of the model, then team up with people serving the other parts.
+
+- [petals](./petals)

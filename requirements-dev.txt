@@ -29,6 +29,7 @@ huggingface_hub
 llama-cpp-python
 nlpcloud
 openai
+petals
 replicate
 rwkv
 text_generation # for HuggingFaceTextGenInference

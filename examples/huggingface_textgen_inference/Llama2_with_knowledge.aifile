@@ -1,5 +1,5 @@
 {
-  "name": "OpenAssistant Falcon 7B with knowledge",
+  "name": "Llama 2 with knowledge",
   "aifileversion": 1,
   "chain": {
     "_type": "stuff_documents_chain",
@@ -21,12 +21,10 @@
     "input_key": "input_knowledge",
     "llm_chain": {
       "_type": "llm_chain",
-      "callback_manager": null,
-      "callbacks": null,
       "llm": {
         "_type": "huggingface_textgen_inference",
         "inference_server_url": "your-server-url",
-        "max_new_tokens": 400,
+        "max_new_tokens": 512,
         "repetition_penalty": 1.03,
         "streaming": true,
         "temperature": 0.01,
@@ -45,7 +43,7 @@
         ],
         "output_parser": null,
         "partial_variables": {},
-        "template": "<|system|>{summaries}<|endoftext|>{input_history}<|prompter|>{input_text}<|endoftext|><|assistant|>",
+        "template": "<s>[INST] <<SYS>>\nYou are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.\n\nIf a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\n<</SYS>>\n\n{input_history}</s>\n<s>[INST] Given this text extracts:\n-----\n{summaries}\n-----\nPlease answer the following question:\n{input_text}[/INST]",
         "template_format": "f-string",
         "validate_template": true
       },
