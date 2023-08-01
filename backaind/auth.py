@@ -32,7 +32,7 @@ def login():
         ).fetchone()
 
         if user is None or not check_password_hash(user["passhash"], password):
-            flash("Incorrect username or password.")
+            flash("Incorrect username or password.", "danger")
         else:
             session.clear()
             session["user_id"] = user["id"]
@@ -59,6 +59,26 @@ def load_logged_in_user():
         g.user = (
             get_db().execute("SELECT * FROM user WHERE id = ?", (user_id,)).fetchone()
         )
+
+
+def is_password_correct(username: str, password: str):
+    """Check if the password for the given user is correct."""
+    database = get_db()
+    user = database.execute(
+        "SELECT * FROM user WHERE username = ?", (username,)
+    ).fetchone()
+
+    return user is not None and check_password_hash(user["passhash"], password)
+
+
+def set_password(username: str, password: str):
+    """Set the (new) password for an user."""
+    database = get_db()
+    database.execute(
+        "UPDATE user SET passhash = ? WHERE username = ?",
+        (generate_password_hash(password), username),
+    )
+    database.commit()
 
 
 def login_required(view):
@@ -98,6 +118,16 @@ def add_user(username, password):
     click.echo(f"Registration successful. Hello {username}, nice to meet you!")
 
 
+@click.command("set-password")
+@click.option("--username", prompt="User name")
+@click.password_option()
+def set_password_command(username, password):
+    """Command to set the (new) password for an user."""
+    set_password(username, password)
+    click.echo(f"Successfully set the password for {username}.")
+
+
 def init_app(app):
     """Register auth CLI commands with the application instance."""
     app.cli.add_command(add_user)
+    app.cli.add_command(set_password_command)

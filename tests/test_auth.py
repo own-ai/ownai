@@ -2,7 +2,12 @@
 import pytest
 from flask import g, session
 
-from backaind.auth import add_user
+from backaind.auth import (
+    add_user,
+    is_password_correct,
+    set_password,
+    set_password_command,
+)
 from backaind.db import get_db
 
 
@@ -40,6 +45,24 @@ def test_logout(client, auth):
         assert "user_id" not in session
 
 
+def test_is_password_correct(app):
+    """Test whether checking the password works."""
+    with app.app_context():
+        assert not is_password_correct("test", "a")
+        assert not is_password_correct("a", "test")
+        assert is_password_correct("test", "test")
+
+
+def test_set_password(app):
+    """Test whether setting the password works."""
+    with app.app_context():
+        set_password("test", "a")
+        assert not is_password_correct("test", "test")
+        assert is_password_correct("test", "a")
+        set_password("test", "test")
+        assert is_password_correct("test", "test")
+
+
 def test_add_user_command(app, runner):
     """Test whether registering a new user works."""
     username = "a-new-user"
@@ -62,3 +85,18 @@ def test_add_user_command(app, runner):
 
         result = runner.invoke(add_user, input=f"{username}\n{password}\n{password}\n")
         assert "already registered" in result.output
+
+
+def test_set_password_command(app, runner):
+    """Test whether setting the password works."""
+    username = "test"
+    password = "a-password"
+    with app.app_context():
+        assert is_password_correct(username, "test")
+        result = runner.invoke(
+            set_password_command, input=f"{username}\n{password}\n{password}\n"
+        )
+        assert "Successfully set the password" in result.output
+        assert is_password_correct(username, password)
+        assert not is_password_correct(username, "test")
+        set_password("test", "test")

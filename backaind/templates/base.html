@@ -42,8 +42,8 @@
     <div
       class="{% block main_classes %}container py-4 px-3 mx-auto{% endblock %}"
     >
-      {% for message in get_flashed_messages() %}
-        <div class="alert alert-warning" role="alert">{{ message }}</div>
+      {% for category, message in get_flashed_messages(with_categories=true) %}
+        <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
       {% endfor %}
       {% block main %}
       {% endblock %}
