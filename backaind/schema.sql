@@ -21,3 +21,13 @@ CREATE TABLE knowledge (
   chunk_size INTEGER NOT NULL,
   persist_directory TEXT NOT NULL
 );
+
+DROP TABLE IF EXISTS settings;
+CREATE TABLE settings (
+  user_id INTEGER NOT NULL,
+  domain TEXT NOT NULL,
+  name TEXT NOT NULL,
+  value TEXT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES user(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+CREATE UNIQUE INDEX settings_user_domain_name ON settings (user_id, domain, name);

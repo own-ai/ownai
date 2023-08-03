@@ -4,7 +4,7 @@
 
 ## Set up
 
-To use these AIs, you should set the environment variable `AI21_API_KEY` with your API key (e.g. in your server's `.env` file).
+To use these AIs, you should set the environment variable `AI21_API_KEY` with your API key (in ownAI, select "Connect to external AI providers" in the user menu in the upper right corner, or set the variables globally in your server's `.env` file).
 Then download the aifile and load it with ownAI (in ownAI, click on the logo in the upper left corner to open the menu, then select "AI Workshop", then "New AI" and "Load Aifile").
 
 ## Privacy

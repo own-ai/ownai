@@ -5,7 +5,7 @@
 To use Vertex AI PaLM you must either:
 
 - Have credentials configured for your environment (gcloud, workload identity, etc...)
-- Store the path to a service account JSON file as the `GOOGLE_APPLICATION_CREDENTIALS` environment variable (e.g. in your server's `.env` file)
+- Store the path to a service account JSON file as the `GOOGLE_APPLICATION_CREDENTIALS` environment variable (in ownAI, select "Connect to external AI providers" in the user menu in the upper right corner, or set the variables globally in your server's `.env` file)
 
 Then download the aifile and load it with ownAI (in ownAI, click on the logo in the upper left corner to open the menu, then select "AI Workshop", then "New AI" and "Load Aifile").
 

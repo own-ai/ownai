@@ -20,9 +20,17 @@
     </li>
     <li><hr class="dropdown-divider" /></li>
     <li>
-      <a class="dropdown-item" href="{{ url_for('settings.password') }}"
-        >Change password</a
+      <a
+        class="dropdown-item"
+        href="{{ url_for('settings.external_providers') }}"
       >
+        Connect to external AI providers
+      </a>
+    </li>
+    <li>
+      <a class="dropdown-item" href="{{ url_for('settings.password') }}">
+        Change password
+      </a>
     </li>
     <li><hr class="dropdown-divider" /></li>
     <li>

@@ -20,7 +20,9 @@ global_chain_input_keys = None
 chain_lock = Lock()
 
 
-def get_chain(ai_id: int) -> Tuple[Chain, Set[str]]:
+def get_chain(
+    ai_id: int, updated_environment: Optional[dict] = None
+) -> Tuple[Chain, Set[str]]:
     """Load the AI chain or create a new chain if it doesn't exist."""
     # pylint: disable=global-statement
     global global_chain, global_chain_id, global_chain_input_keys
@@ -31,7 +33,8 @@ def get_chain(ai_id: int) -> Tuple[Chain, Set[str]]:
         if not chain or not chain_input_keys or chain_id != ai_id:
             aifile = get_aifile_from_db(ai_id)
             chain_input_keys = json.loads(aifile["input_keys"])
-            chain = load_chain_from_config(json.loads(aifile["chain"]))
+            with UpdatedEnvironment(updated_environment or {}):
+                chain = load_chain_from_config(json.loads(aifile["chain"]))
             set_text_generation_inference_token(chain)
             global_chain = chain
             global_chain_id = ai_id
@@ -59,9 +62,10 @@ def reply(
     knowledge_id: Optional[int] = None,
     memory: Optional[BaseMemory] = None,
     callbacks: Callbacks = None,
+    updated_environment: Optional[dict] = None,
 ) -> str:
     """Run the chain with an input message and return the AI output."""
-    (chain, chain_input_keys) = get_chain(ai_id)
+    (chain, chain_input_keys) = get_chain(ai_id, updated_environment)
     inputs = {}
     has_memory = (
         memory
@@ -109,3 +113,24 @@ def set_text_generation_inference_token(chain: Chain):
     all_huggingface_instances = find_instances(chain, HuggingFaceTextGenInference)
     for instance in all_huggingface_instances:
         instance.client.headers = {"Authorization": f"Bearer {token}"}
+
+
+class UpdatedEnvironment:
+    """Temporarily update the environment variables."""
+
+    def __init__(self, new_values):
+        self.new_values = new_values
+        self.old_values = {}
+
+    def __enter__(self):
+        for key, new_value in self.new_values.items():
+            if key in os.environ:
+                self.old_values[key] = os.environ[key]
+            os.environ[key] = new_value
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        for key in self.new_values.keys():
+            if key in self.old_values:
+                os.environ[key] = self.old_values[key]
+            else:
+                del os.environ[key]

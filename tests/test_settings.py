@@ -1,8 +1,13 @@
 """Test the settings blueprint."""
 import pytest
+from flask import session
 from backaind.auth import is_password_correct, set_password
+from backaind.settings import EXTERNAL_PROVIDER_ENVVARS, get_settings
 
-SETTINGS_PATHS = ("/settings/password",)
+SETTINGS_PATHS = (
+    "/settings/password",
+    "/settings/external-providers",
+)
 
 
 @pytest.mark.parametrize("path", SETTINGS_PATHS)
@@ -95,3 +100,59 @@ def test_password_change_works(auth, app, client):
         set_password("test", "test")
         assert not is_password_correct("test", "a" * 10)
         assert is_password_correct("test", "test")
+
+
+def test_get_external_providers_page(client, auth):
+    """Test whether the external providers page gets displayed."""
+    auth.login()
+    response = client.get("/settings/external-providers")
+    assert b"<h3>Connect to external AI providers</h3>" in response.data
+
+
+def test_save_external_providers(auth, client):
+    """Test whether external providers get inserted, updated and deleted correctly."""
+    with client:
+        auth.login()
+        user_id = session["user_id"]
+        provider1 = EXTERNAL_PROVIDER_ENVVARS[0]
+        provider2 = EXTERNAL_PROVIDER_ENVVARS[1]
+        assert get_settings(user_id).get("external-providers", {}) == {}
+
+        response = client.post(
+            "/settings/external-providers",
+            data={
+                provider1: "test1",
+                provider2: "test2",
+            },
+        )
+        assert b"Settings saved successfully." in response.data
+        assert (
+            get_settings(user_id).get("external-providers", {}).get(provider1)
+            == "test1"
+        )
+        assert (
+            get_settings(user_id).get("external-providers", {}).get(provider2)
+            == "test2"
+        )
+
+        response = client.post(
+            "/settings/external-providers",
+            data={
+                provider2: "test2_new",
+            },
+        )
+        assert b"Settings saved successfully." in response.data
+        assert (
+            get_settings(user_id).get("external-providers", {}).get(provider1) is None
+        )
+        assert (
+            get_settings(user_id).get("external-providers", {}).get(provider2)
+            == "test2_new"
+        )
+
+        response = client.post(
+            "/settings/external-providers",
+            data={},
+        )
+        assert b"Settings saved successfully." in response.data
+        assert get_settings(user_id).get("external-providers", {}) == {}

@@ -1,5 +1,6 @@
 """Test the handling of AI chains."""
 import os
+import pytest
 from langchain.chains.loading import load_chain_from_config
 from langchain.llms.huggingface_text_gen_inference import HuggingFaceTextGenInference
 from langchain.memory import ConversationBufferWindowMemory
@@ -10,6 +11,7 @@ from backaind.brain import (
     reset_global_chain,
     find_instances,
     set_text_generation_inference_token,
+    UpdatedEnvironment,
 )
 import backaind.brain
 
@@ -52,7 +54,7 @@ def test_reply_runs_the_chain(monkeypatch):
             """Mock function for calling the chain."""
             return {"output_text": "Response"}
 
-    def fake_get_chain(_ai_id):
+    def fake_get_chain(_ai_id, _updated_environment):
         return (FakeChain(), set())
 
     monkeypatch.setattr("backaind.brain.get_chain", fake_get_chain)
@@ -72,7 +74,7 @@ def test_reply_sets_inputs(monkeypatch):
             output = f"{inputs['input_text']},{inputs['input_knowledge']},{inputs['input_history']}"
             return {"output_text": output}
 
-    def fake_get_chain(_ai_id):
+    def fake_get_chain(_ai_id, _updated_environment):
         return (
             FakeChain(),
             {"input_text", "input_knowledge", "input_history", "input_unknown"},
@@ -117,3 +119,33 @@ def test_set_text_generation_inference_token():
     assert all_huggingface_instances[0].client.headers == {
         "Authorization": "Bearer test_token"
     }
+
+
+def test_updated_environment_resets_values():
+    """Test if the environment is reset after the context manager."""
+    os.environ["EXISTING_VAR"] = "old_value"
+    if "NEW_VAR" in os.environ:
+        del os.environ["NEW_VAR"]
+
+    with UpdatedEnvironment({"NEW_VAR": "new_value", "EXISTING_VAR": "new_value"}):
+        assert os.getenv("NEW_VAR") == "new_value"
+        assert os.getenv("EXISTING_VAR") == "new_value"
+
+    assert os.getenv("NEW_VAR") is None
+    assert os.getenv("EXISTING_VAR") == "old_value"
+
+
+def test_updated_environment_handles_exceptions():
+    """Test if the environment is reset even if an exception is raised."""
+    os.environ["EXISTING_VAR"] = "old_value"
+    if "NEW_VAR" in os.environ:
+        del os.environ["NEW_VAR"]
+
+    with pytest.raises(RuntimeError):
+        with UpdatedEnvironment({"NEW_VAR": "new_value", "EXISTING_VAR": "new_value"}):
+            assert os.getenv("NEW_VAR") == "new_value"
+            assert os.getenv("EXISTING_VAR") == "new_value"
+            raise RuntimeError("Test")
+
+    assert os.getenv("NEW_VAR") is None
+    assert os.getenv("EXISTING_VAR") == "old_value"

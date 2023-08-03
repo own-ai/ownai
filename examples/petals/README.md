@@ -4,7 +4,7 @@
 
 ## Set up
 
-To access the Llama 2 model, you need to set the environment variable `HUGGINGFACE_API_KEY` with a Hugging Face API key that has accepted the terms and conditions (e.g. in your server's `.env` file).
+To access the Llama 2 model, you need to set the environment variable `HUGGINGFACE_API_KEY` with a Hugging Face API key that has accepted the terms and conditions (in ownAI, select "Connect to external AI providers" in the user menu in the upper right corner, or set the variables globally in your server's `.env` file).
 Then download the aifile and load it with ownAI (in ownAI, click on the logo in the upper left corner to open the menu, then select "AI Workshop", then "New AI" and "Load Aifile").
 
 ## Privacy

@@ -10,6 +10,7 @@ from backaind.aifile import get_all_aifiles_from_db
 from backaind.auth import login_required
 from backaind.brain import reply
 from backaind.knowledge import get_all_knowledge_entries_from_db
+from backaind.settings import get_settings
 
 bp = Blueprint("ainteraction", __name__)
 
@@ -83,6 +84,7 @@ def handle_incoming_message(message):
             knowledge_id,
             memory,
             [AinteractionCallbackHandler(response_id)],
+            get_settings(session.get("user_id", -1)).get("external-providers", {}),
         )
         send_response(response_id, response.strip())
     # pylint: disable=broad-exception-caught

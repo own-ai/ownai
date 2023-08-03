@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  External AI providers
+{% endblock %}
+
+{% block main %}
+  <form
+    method="post"
+    class="d-flex flex-column gap-3 mx-auto col-sm-9 col-md-6"
+  >
+    <h3>Connect to external AI providers</h3>
+    <p>
+      You can access AIs from within ownAI that are operated by external
+      providers. To connect to these providers, you will need an account with
+      them. You will then receive a token or API key from the provider, which
+      you can paste into this fields to use the
+      <a
+        href="http://aifiles.ownai.org/?aifileversion=1"
+        target="_blank"
+        rel="noopener noreferrer"
+        >corresponding Aifiles</a
+      >.
+    </p>
+    {% for envvar in envvars %}
+      <div>
+        <label for="input-{{ envvar }}" class="form-label">{{ envvar }}</label>
+        <input
+          type="text"
+          name="{{ envvar }}"
+          id="input-{{ envvar }}"
+          class="form-control"
+          value="{{ settings[envvar] }}"
+        />
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Save Settings</button>
+  </form>
+{% endblock %}
