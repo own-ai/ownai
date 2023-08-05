@@ -6,7 +6,8 @@
     "llm": {
       "_type": "huggingface_textgen_inference",
       "inference_server_url": "your-server-url",
-      "max_new_tokens": 512,
+      "max_new_tokens": 1024,
+      "truncate": 1024,
       "repetition_penalty": 1.03,
       "streaming": true,
       "temperature": 0.01,

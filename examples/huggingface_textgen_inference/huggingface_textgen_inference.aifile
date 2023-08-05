@@ -18,7 +18,8 @@
     },
     "llm": {
       "inference_server_url": "http://localhost:8010/",
-      "max_new_tokens": 512,
+      "max_new_tokens": 1024,
+      "truncate": 1024,
       "top_k": 10,
       "top_p": 0.95,
       "typical_p": 0.95,
