@@ -53,6 +53,14 @@
           @change="handleFileInput"
         />
       </div>
+      <div class="alert alert-light mt-5" role="alert">
+        Knowledge added here is only accessible to AIs with an
+        <code>input_knowledge</code> input key in their
+        <a href="/workshop/ai">aifile</a>. You can recognize these AIs by a
+        yellow dot
+        <span class="d-inline-block rounded-circle p-1 bg-warning"></span>
+        in the AI list on the <a href="/">interaction view</a>.
+      </div>
     </template>
   </div>
 </template>
