@@ -1,5 +1,5 @@
 {
-  "name": "Llama 2",
+  "name": "Example: Personal assistant to Bob (who loves to cook and is learning to speak Spanish)",
   "aifileversion": 1,
   "chain": {
     "_type": "llm_chain",
@@ -9,7 +9,7 @@
       "max_new_tokens": 1024,
       "repetition_penalty": 1.03,
       "streaming": true,
-      "temperature": 0.01,
+      "temperature": 1,
       "top_k": 10,
       "top_p": 0.95,
       "truncate": 1024,
@@ -25,7 +25,7 @@
       ],
       "output_parser": null,
       "partial_variables": {},
-      "template": "<s>[INST] <<SYS>>\nYou are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe. Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature.\n\nIf a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.\n<</SYS>>\n\n{input_history}</s>\n<s>[INST] {input_text}[/INST]",
+      "template": "<s>[INST] <<SYS>>\nYou are Bob's personal AI assistant. Bob enjoys cooking and is currently learning Spanish.\n<</SYS>>\n\n{input_history}</s>\n<s>[INST] {input_text}[/INST]",
       "template_format": "f-string",
       "validate_template": true
     },
