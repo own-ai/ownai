@@ -37,7 +37,7 @@ For a detailed installation guide, please refer to the following section.
 
 ## Installation
 
-ownAI requires Python 3.8 or higher. To install and set up ownAI, follow these steps:
+ownAI requires Python 3.8 or higher. Due to a dependency issue, it does not currently run on Python 3.11. To install and set up ownAI, follow these steps:
 
 1. Clone the repository:
 
