@@ -67,7 +67,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { throwOnFetchError } from "@/helpers/fetch";
+import { throwOnFetchError, throwOnDemoUser } from "@/helpers/fetch";
 
 const props = defineProps<{
   knowledgeId: number;
@@ -137,6 +137,7 @@ const uploadFile = async (file: File, url: string): Promise<void> => {
   formData.append("file", file);
 
   try {
+    throwOnDemoUser();
     const response = await fetch(url, {
       method: "POST",
       body: formData,

@@ -21,6 +21,11 @@
     {% endblock %}
   </head>
   <body class="h-100 d-flex flex-column">
+    {% if g.is_demo_user %}
+      <script>
+        window.isDemoUser = true;
+      </script>
+    {% endif %}
     <nav class="navbar border-bottom">
       <div class="container-fluid">
         {% include '_includes/main_menu.html' %}

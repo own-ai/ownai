@@ -6,7 +6,7 @@ import uuid
 from flask import Blueprint, jsonify, request, make_response, abort, current_app
 from langchain.document_loaders.base import BaseLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from backaind.auth import login_required
+from backaind.auth import login_required, login_required_allow_demo
 from backaind.db import get_db
 from backaind.knowledge import (
     add_to_knowledge,
@@ -47,7 +47,7 @@ def validate(knowledge_json):
 
 
 @bp.route("/", methods=["GET"])
-@login_required
+@login_required_allow_demo
 def get_all_knowledge():
     """Get all knowledge."""
     knowledges = [
@@ -63,7 +63,7 @@ def get_all_knowledge():
 
 
 @bp.route("/<int:knowledge_id>", methods=["GET"])
-@login_required
+@login_required_allow_demo
 def get_knowledge(knowledge_id):
     """Get a specific knowledge entry."""
     knowledge = get_knowledge_entry_from_db(knowledge_id)

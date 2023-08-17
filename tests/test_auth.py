@@ -1,4 +1,5 @@
 """Test the authentication."""
+import os
 import pytest
 from flask import g, session
 
@@ -7,6 +8,8 @@ from backaind.auth import (
     is_password_correct,
     set_password,
     set_password_command,
+    login_required,
+    login_required_allow_demo,
 )
 from backaind.db import get_db
 
@@ -61,6 +64,91 @@ def test_set_password(app):
         assert is_password_correct("test", "a")
         set_password("test", "test")
         assert is_password_correct("test", "test")
+
+
+def test_demo_user(client):
+    """Test whether the demo user is enabled automatically iff ENABLE_DEMO_MODE is set."""
+    with client:
+        client.get("/")
+        assert session.get("user_id") is None
+        assert g.user is None
+        assert not g.is_demo_user
+
+        os.environ["ENABLE_DEMO_MODE"] = "1"
+        client.get("/")
+        assert session["user_id"] == -1
+        assert g.user["username"] == "demo"
+        assert g.user["id"] == -1
+        assert g.is_demo_user
+
+        del os.environ["ENABLE_DEMO_MODE"]
+        client.get("/")
+        assert session.get("user_id") is None
+        assert g.user is None
+        assert not g.is_demo_user
+
+
+def test_login_required_redirects_if_not_logged_in(app, client):
+    """Test whether the login_required decorator redirects to login page."""
+    with app.app_context(), app.test_request_context():
+        client.get("/")
+        response = login_required(lambda: "the_view")()
+        assert (
+            not isinstance(response, str)
+            and response.headers["Location"] == "/auth/login"
+        )
+
+
+def test_login_required_declines_demo(app, client):
+    """Test whether the login_required decorator does not accept the demo user."""
+    with app.app_context(), app.test_request_context():
+        os.environ["ENABLE_DEMO_MODE"] = "1"
+        client.get("/")
+        response = login_required(lambda: "the_view")()
+        assert (
+            not isinstance(response, str)
+            and response.headers["Location"] == "/auth/login"
+        )
+        del os.environ["ENABLE_DEMO_MODE"]
+
+
+def test_login_required_accepts_user(app, client, auth):
+    """Test whether the login_required decorator allows signed in users."""
+    with app.app_context(), app.test_request_context():
+        auth.login()
+        client.get("/")
+        response = login_required(lambda: "the_view")()
+        assert response == "the_view"
+
+
+def test_login_required_allow_demo_redirects_if_not_logged_in(app, client):
+    """Test whether the login_required_allow_demo decorator redirects to login page."""
+    with app.app_context(), app.test_request_context():
+        client.get("/")
+        response = login_required_allow_demo(lambda: "the_view")()
+        assert (
+            not isinstance(response, str)
+            and response.headers["Location"] == "/auth/login"
+        )
+
+
+def test_login_required_allow_demo_accepts_demo(app, client):
+    """Test whether the login_required_allow_demo decorator allows the demo user."""
+    with app.app_context(), app.test_request_context():
+        os.environ["ENABLE_DEMO_MODE"] = "1"
+        client.get("/")
+        response = login_required_allow_demo(lambda: "the_view")()
+        assert response == "the_view"
+        del os.environ["ENABLE_DEMO_MODE"]
+
+
+def test_login_required_allow_demo_accepts_user(app, client, auth):
+    """Test whether the login_required decorator allows signed in users."""
+    with app.app_context(), app.test_request_context():
+        auth.login()
+        client.get("/")
+        response = login_required_allow_demo(lambda: "the_view")()
+        assert response == "the_view"
 
 
 def test_add_user_command(app, runner):

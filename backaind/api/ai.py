@@ -2,7 +2,7 @@
 import json
 from flask import Blueprint, jsonify, request, make_response, abort
 from backaind.aifile import get_all_aifiles_from_db, get_aifile_from_db
-from backaind.auth import login_required
+from backaind.auth import login_required, login_required_allow_demo
 from backaind.brain import reset_global_chain
 from backaind.db import get_db
 
@@ -41,7 +41,7 @@ def validate(ai_json):
 
 
 @bp.route("/", methods=["GET"])
-@login_required
+@login_required_allow_demo
 def get_all_ais():
     """Get all AIs."""
     aifiles = [
@@ -56,7 +56,7 @@ def get_all_ais():
 
 
 @bp.route("/<int:ai_id>", methods=["GET"])
-@login_required
+@login_required_allow_demo
 def get_ai(ai_id):
     """Get a specific AI."""
     aifile = get_aifile_from_db(ai_id)

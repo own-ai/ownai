@@ -7,7 +7,7 @@ from langchain.callbacks.base import BaseCallbackHandler
 from langchain.memory import ConversationBufferWindowMemory
 
 from backaind.aifile import get_all_aifiles_from_db
-from backaind.auth import login_required
+from backaind.auth import login_required_allow_demo
 from backaind.brain import reply
 from backaind.knowledge import get_all_knowledge_entries_from_db
 from backaind.settings import get_settings
@@ -29,7 +29,7 @@ class AinteractionCallbackHandler(BaseCallbackHandler):
 
 
 @bp.route("/")
-@login_required
+@login_required_allow_demo
 def index():
     """Render the main ainteraction view."""
     aifiles = get_all_aifiles_from_db()

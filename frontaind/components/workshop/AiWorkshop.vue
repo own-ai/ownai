@@ -202,17 +202,25 @@ const duplicate = async (aiId: number) => {
     return;
   }
   const { id, ...aiCopy } = { ...ai, name: `${ai.name} copy` };
-  const newAi = await aiStore.createAi(aiCopy);
-  selectedAiId.value = newAi.id;
-  router.push({ params: { id: newAi.id } });
+  try {
+    const newAi = await aiStore.createAi(aiCopy);
+    selectedAiId.value = newAi.id;
+    router.push({ params: { id: newAi.id } });
+  } catch (error) {
+    alert(error);
+  }
 };
 
 const deleteAi = async (aiId: number) => {
   const ai = aiStore.ais.find((ai) => ai.id === aiId);
   if (ai && confirm(`Really delete ${ai.name}?`)) {
-    await aiStore.deleteAi(ai.id);
-    if (ai.id === selectedAiId.value) {
-      newEmpty();
+    try {
+      await aiStore.deleteAi(ai.id);
+      if (ai.id === selectedAiId.value) {
+        newEmpty();
+      }
+    } catch (error) {
+      alert(error);
     }
   }
 };

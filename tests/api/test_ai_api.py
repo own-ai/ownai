@@ -1,4 +1,5 @@
 """Test the AI API."""
+import os
 import json
 import pytest
 from backaind.aifile import get_aifile_from_db
@@ -11,6 +12,23 @@ def test_auth_required(client):
     assert client.post("/api/ai/", json={}).status_code == 401
     assert client.put("/api/ai/1", json={}).status_code == 401
     assert client.delete("/api/ai/1").status_code == 401
+
+
+def test_demo_user_can_read(client):
+    """Test whether the demo user can access the read endpoints."""
+    os.environ["ENABLE_DEMO_MODE"] = "1"
+    assert client.get("/api/ai/").status_code == 200
+    assert client.get("/api/ai/2").status_code == 200
+    del os.environ["ENABLE_DEMO_MODE"]
+
+
+def test_demo_user_cannot_write(client):
+    """Test whether the demo user cannot access the write endpoints."""
+    os.environ["ENABLE_DEMO_MODE"] = "1"
+    assert client.post("/api/ai/", json={}).status_code == 401
+    assert client.put("/api/ai/1", json={}).status_code == 401
+    assert client.delete("/api/ai/1").status_code == 401
+    del os.environ["ENABLE_DEMO_MODE"]
 
 
 def test_get_all_ais(client, auth):

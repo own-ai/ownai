@@ -1,6 +1,11 @@
 """Allow users to see and change their settings."""
 from flask import Blueprint, request, flash, render_template, g
-from backaind.auth import login_required, is_password_correct, set_password
+from backaind.auth import (
+    login_required_allow_demo,
+    is_password_correct,
+    set_password,
+    is_demo_user,
+)
 from backaind.db import get_db
 
 bp = Blueprint("settings", __name__, url_prefix="/settings")
@@ -38,10 +43,12 @@ EXTERNAL_PROVIDER_ENVVARS = [
 
 
 @bp.route("/password", methods=("GET", "POST"))
-@login_required
+@login_required_allow_demo
 def password():
     """Render the password change page or change the user's password."""
-    if request.method == "POST":
+    if is_demo_user():
+        flash("You cannot change the password of the demo user.", "warning")
+    elif request.method == "POST":
         current_password = request.form["current-password"]
         new_password = request.form["new-password"]
         new_password_confirmation = request.form["new-password-confirmation"]
@@ -60,10 +67,15 @@ def password():
 
 
 @bp.route("/external-providers", methods=("GET", "POST"))
-@login_required
+@login_required_allow_demo
 def external_providers():
     """Render the external providers page or save changed external providers settings."""
-    if request.method == "POST":
+    if is_demo_user():
+        flash(
+            "You cannot change the external providers settings of the demo user.",
+            "warning",
+        )
+    elif request.method == "POST":
         database = get_db()
         for envvar in EXTERNAL_PROVIDER_ENVVARS:
             if envvar in request.form and request.form[envvar].strip():
