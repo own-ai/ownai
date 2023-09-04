@@ -4,10 +4,13 @@ With ownAI you can run your own AIs.
 
 ownAI is an open-source platform written in Python using the Flask framework. It allows you to host and manage AI applications with a web interface for interaction. ownAI supports the customization of AIs for specific use cases and provides a flexible environment for your AI projects.
 
+For a demo installation and a managed private cloud service, please visit [https://ownai.org](https://ownai.org).
+
 ## Table of Contents
 
 - [Features](#features)
 - [Quick start](#quick-start)
+- [Run with Docker](#run-with-docker)
 - [Installation](#installation)
 - [Production setup](#production-setup)
 - [Development setup](#development-setup)
@@ -33,7 +36,26 @@ To get started quickly, clone this repository to your Linux server and execute:
 ```
 
 This will guide you through the installation process and start the server.
-For a detailed installation guide, please refer to the following section.
+For a detailed installation guide, please refer to the following sections.
+
+## Run with Docker
+
+If you have Docker installed, you can run ownAI in a Docker container.
+Otherwise please proceed to the [installation](#installation) section.
+
+To run ownAI with Docker, first configure the server by downloading the `.env.template` file.
+Rename the file to `docker.env` and edit the file.
+Then run the following command (replace `<your-username>` and `<your-password>`):
+
+```
+docker run --name ownai --env OWNAI_ROOT_USER=<your-username> --env OWNAI_ROOT_PASSWORD=<your-password> --env-file ./docker.env -p 5000:5000 ownai/ownai
+```
+
+This is only required for the first run. To start the server again just run:
+
+```
+docker start ownai
+```
 
 ## Installation
 
