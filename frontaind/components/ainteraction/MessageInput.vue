@@ -1,13 +1,16 @@
 <template>
-  <form @submit.prevent="sendMessage" class="d-flex my-4">
-    <input
-      type="text"
+  <form
+    @submit.prevent="sendMessage"
+    class="d-flex my-4 align-items-sm-start flex-column flex-sm-row gap-2"
+  >
+    <textarea
       class="form-control"
       v-model="messageInput"
       placeholder="Send a message"
       required
-    />
-    <button type="submit" class="btn btn-primary ms-2" title="Send">
+      @keydown="checkForSubmit"
+    ></textarea>
+    <button type="submit" class="btn btn-primary" title="Send">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="16"
@@ -33,5 +36,11 @@ const emit = defineEmits(["send-message"]);
 const sendMessage = () => {
   emit("send-message", messageInput.value);
   messageInput.value = "";
+};
+
+const checkForSubmit = (event: KeyboardEvent) => {
+  if ((event.shiftKey || event.ctrlKey) && event.code === "Enter") {
+    sendMessage();
+  }
 };
 </script>
