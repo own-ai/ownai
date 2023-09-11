@@ -3,17 +3,18 @@ import os
 import shutil
 import tempfile
 import uuid
+
 from flask import Blueprint, jsonify, request, make_response, abort, current_app
 from langchain.document_loaders.base import BaseLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from backaind.auth import login_required, login_required_allow_demo
-from backaind.db import get_db
-from backaind.knowledge import (
+
+from ..auth import login_required, login_required_allow_demo
+from ..extensions import db
+from ..knowledge import (
     add_to_knowledge,
-    get_all_knowledge_entries_from_db,
-    get_knowledge_entry_from_db,
     reset_global_knowledge,
 )
+from ..models import Knowledge
 
 bp = Blueprint("api-knowledge", __name__, url_prefix="/api/knowledge")
 
@@ -50,33 +51,15 @@ def validate(knowledge_json):
 @login_required_allow_demo
 def get_all_knowledge():
     """Get all knowledge."""
-    knowledges = [
-        {
-            "id": knowledge["id"],
-            "name": knowledge["name"],
-            "embeddings": knowledge["embeddings"],
-            "chunk_size": knowledge["chunk_size"],
-        }
-        for knowledge in get_all_knowledge_entries_from_db()
-    ]
-    return jsonify(knowledges)
+    return [knowledge.as_dict() for knowledge in db.session.query(Knowledge).all()]
 
 
 @bp.route("/<int:knowledge_id>", methods=["GET"])
 @login_required_allow_demo
 def get_knowledge(knowledge_id):
     """Get a specific knowledge entry."""
-    knowledge = get_knowledge_entry_from_db(knowledge_id)
-    if knowledge is None:
-        abort(404)
-    return jsonify(
-        {
-            "id": knowledge["id"],
-            "name": knowledge["name"],
-            "embeddings": knowledge["embeddings"],
-            "chunk_size": knowledge["chunk_size"],
-        }
-    )
+    knowledge = db.get_or_404(Knowledge, knowledge_id)
+    return knowledge.as_dict()
 
 
 @bp.route("/", methods=["POST"])
@@ -86,7 +69,6 @@ def create_knowledge():
     validate(request.json)
     assert request.json
 
-    database = get_db()
     name = request.json["name"]
     embeddings = request.json["embeddings"]
     chunk_size = request.json["chunk_size"]
@@ -95,23 +77,16 @@ def create_knowledge():
     )
     os.makedirs(persist_directory)
 
-    knowledge_id = database.execute(
-        """
-        INSERT INTO knowledge (name, embeddings, chunk_size, persist_directory)
-        VALUES (?, ?, ?, ?)
-        """,
-        (name, embeddings, chunk_size, persist_directory),
-    ).lastrowid
-    database.commit()
+    new_knowledge = Knowledge(
+        name=name,
+        embeddings=embeddings,
+        chunk_size=chunk_size,
+        persist_directory=persist_directory,
+    )
+    db.session.add(new_knowledge)
+    db.session.commit()
     return (
-        jsonify(
-            {
-                "id": knowledge_id,
-                "name": name,
-                "embeddings": embeddings,
-                "chunk_size": chunk_size,
-            }
-        ),
+        jsonify(new_knowledge.as_dict()),
         201,
     )
 
@@ -123,27 +98,25 @@ def update_knowledge(knowledge_id):
     validate(request.json)
     assert request.json
 
-    original_knowledge = get_knowledge_entry_from_db(knowledge_id)
-    database = get_db()
+    existing_knowledge = db.get_or_404(Knowledge, knowledge_id)
     name = request.json["name"]
     chunk_size = request.json["chunk_size"]
-    if request.json["embeddings"] != original_knowledge["embeddings"]:
+    if request.json["embeddings"] != existing_knowledge.embeddings:
         abort(
             make_response(
                 jsonify(error="Cannot change the embeddings type afterwards."), 400
             )
         )
-    database.execute(
-        "UPDATE knowledge SET name = ?, chunk_size = ? WHERE id = ?",
-        (name, chunk_size, knowledge_id),
-    )
-    database.commit()
+
+    existing_knowledge.name = name
+    existing_knowledge.chunk_size = chunk_size
+    db.session.commit()
     reset_global_knowledge(knowledge_id)
     return jsonify(
         {
             "id": knowledge_id,
             "name": name,
-            "embeddings": original_knowledge["embeddings"],
+            "embeddings": existing_knowledge.embeddings,
             "chunk_size": chunk_size,
         }
     )
@@ -153,10 +126,10 @@ def update_knowledge(knowledge_id):
 @login_required
 def delete_knowledge(knowledge_id):
     """Delete a knowledge entry."""
-    persist_directory = get_knowledge_entry_from_db(knowledge_id)["persist_directory"]
-    database = get_db()
-    database.execute("DELETE FROM knowledge WHERE id = ?", (knowledge_id,))
-    database.commit()
+    existing_knowledge = db.get_or_404(Knowledge, knowledge_id)
+    persist_directory = existing_knowledge.persist_directory
+    db.session.delete(existing_knowledge)
+    db.session.commit()
     shutil.rmtree(persist_directory)
     reset_global_knowledge(knowledge_id)
     return ("", 204)
@@ -213,8 +186,8 @@ def handle_upload(file):
 
 def load_into_knowledge(loader: BaseLoader, knowledge_id: int):
     """Load content from the document loader into knowledge."""
-    chunk_size = get_knowledge_entry_from_db(knowledge_id)["chunk_size"]
+    knowledge = db.get_or_404(Knowledge, knowledge_id)
     chunks = loader.load_and_split(
-        RecursiveCharacterTextSplitter(chunk_size=chunk_size)
+        RecursiveCharacterTextSplitter(chunk_size=knowledge.chunk_size)
     )
     add_to_knowledge(knowledge_id, chunks)

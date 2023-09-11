@@ -2,7 +2,8 @@
 import os
 import json
 import pytest
-from backaind.aifile import get_aifile_from_db
+from backaind.extensions import db
+from backaind.models import Ai
 
 
 def test_auth_required(client):
@@ -60,8 +61,8 @@ def test_create_ai(client, auth, app):
     )
     assert json.loads(response.data)["id"] == 3
     with app.app_context():
-        entry = get_aifile_from_db(3)
-        assert entry["name"] == "Test"
+        entry = db.get_or_404(Ai, 3)
+        assert entry and entry.name == "Test"
 
 
 def test_update_ai(client, auth, app):
@@ -72,8 +73,8 @@ def test_update_ai(client, auth, app):
     )
     assert json.loads(response.data)["name"] == "Test"
     with app.app_context():
-        entry = get_aifile_from_db(1)
-        assert entry["name"] == "Test"
+        entry = db.get_or_404(Ai, 1)
+        assert entry and entry.name == "Test"
 
 
 def test_delete_ai(client, auth, app):
@@ -82,7 +83,7 @@ def test_delete_ai(client, auth, app):
     response = client.delete("/api/ai/1")
     assert response.status_code == 204
     with app.app_context():
-        entry = get_aifile_from_db(1)
+        entry = db.session.get(Ai, 1)
         assert entry is None
 
 

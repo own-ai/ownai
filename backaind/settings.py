@@ -1,12 +1,14 @@
 """Allow users to see and change their settings."""
 from flask import Blueprint, request, flash, render_template, g
-from backaind.auth import (
+
+from .auth import (
     login_required_allow_demo,
     is_password_correct,
     set_password,
     is_demo_user,
 )
-from backaind.db import get_db
+from .extensions import db
+from .models import Setting
 
 bp = Blueprint("settings", __name__, url_prefix="/settings")
 
@@ -55,12 +57,12 @@ def password():
 
         if new_password != new_password_confirmation:
             flash("Password and confirmation do not match.", "danger")
-        elif not is_password_correct(g.user["username"], current_password):
+        elif not is_password_correct(g.user.username, current_password):
             flash("Incorrect current password.", "danger")
         elif len(new_password) < 10:
             flash("Password must be at least 10 characters long.", "danger")
         else:
-            set_password(g.user["username"], new_password)
+            set_password(g.user.username, new_password)
             flash("Password changed successfully.", "success")
 
     return render_template("settings/password.html")
@@ -76,28 +78,29 @@ def external_providers():
             "warning",
         )
     elif request.method == "POST":
-        database = get_db()
         for envvar in EXTERNAL_PROVIDER_ENVVARS:
+            setting = (
+                db.session.query(Setting)
+                .filter_by(user_id=g.user.id, domain="external-providers", name=envvar)
+                .first()
+            )
             if envvar in request.form and request.form[envvar].strip():
-                database.execute(
-                    """INSERT OR REPLACE INTO settings (user_id, domain, name, value)
-                    VALUES (?, ?, ?, ?)""",
-                    (
-                        g.user["id"],
-                        "external-providers",
-                        envvar,
-                        request.form[envvar].strip(),
-                    ),
-                )
-            else:
-                database.execute(
-                    "DELETE FROM settings WHERE user_id = ? AND domain = ? AND name = ?",
-                    (g.user["id"], "external-providers", envvar),
-                )
-        database.commit()
+                if setting is None:
+                    setting = Setting(
+                        user_id=g.user.id,
+                        domain="external-providers",
+                        name=envvar,
+                        value=request.form[envvar].strip(),
+                    )
+                    db.session.add(setting)
+                else:
+                    setting.value = request.form[envvar].strip()
+            elif setting is not None:
+                db.session.delete(setting)
+        db.session.commit()
         flash("Settings saved successfully.", "success")
 
-    settings = get_settings(g.user["id"])
+    settings = get_settings(g.user.id)
     return render_template(
         "settings/external_providers.html",
         envvars=EXTERNAL_PROVIDER_ENVVARS,
@@ -107,10 +110,7 @@ def external_providers():
 
 def get_settings(user_id: int):
     """Return the settings for a specified user."""
-    database = get_db()
     settings = {}
-    for row in database.execute(
-        "SELECT domain, name, value FROM settings WHERE user_id = ?", (user_id,)
-    ):
-        settings.setdefault(row["domain"], {})[row["name"]] = row["value"]
+    for setting in db.session.query(Setting).filter_by(user_id=user_id):
+        settings.setdefault(setting.domain, {})[setting.name] = setting.value
     return settings

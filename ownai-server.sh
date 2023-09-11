@@ -40,7 +40,7 @@ then
         echo "To do so, you can do ONE of the following:"
         echo ""
         echo "- Execute the following commands:"
-        echo "    flask init-db"
+        echo "    flask db upgrade"
         echo "    flask add-user"
         echo "- OR set the environment variables OWNAI_ROOT_USER and OWNAI_ROOT_PASSWORD"
         echo "  (only required for the first run)"
@@ -51,7 +51,7 @@ then
         exit 1
     fi
 
-    flask --app backaind init-db
+    flask --app backaind db upgrade
     flask --app backaind add-user --username $OWNAI_ROOT_USER --password $OWNAI_ROOT_PASSWORD
 fi
 

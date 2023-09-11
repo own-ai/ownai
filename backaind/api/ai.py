@@ -1,10 +1,10 @@
 """API to create, read, update and delete AIs."""
-import json
 from flask import Blueprint, jsonify, request, make_response, abort
-from backaind.aifile import get_all_aifiles_from_db, get_aifile_from_db
-from backaind.auth import login_required, login_required_allow_demo
-from backaind.brain import reset_global_chain
-from backaind.db import get_db
+
+from ..auth import login_required, login_required_allow_demo
+from ..brain import reset_global_chain
+from ..extensions import db
+from ..models import Ai
 
 bp = Blueprint("api-ai", __name__, url_prefix="/api/ai")
 
@@ -44,31 +44,15 @@ def validate(ai_json):
 @login_required_allow_demo
 def get_all_ais():
     """Get all AIs."""
-    aifiles = [
-        {
-            **ai,
-            "chain": json.loads(ai["chain"]),
-            "input_keys": json.loads(ai["input_keys"]),
-        }
-        for ai in get_all_aifiles_from_db()
-    ]
-    return jsonify(aifiles)
+    return [ai.as_dict() for ai in db.session.query(Ai).all()]
 
 
 @bp.route("/<int:ai_id>", methods=["GET"])
 @login_required_allow_demo
 def get_ai(ai_id):
     """Get a specific AI."""
-    aifile = get_aifile_from_db(ai_id)
-    if aifile is None:
-        abort(404)
-    return jsonify(
-        {
-            **aifile,
-            "chain": json.loads(aifile["chain"]),
-            "input_keys": json.loads(aifile["input_keys"]),
-        }
-    )
+    aifile = db.get_or_404(Ai, ai_id)
+    return aifile.as_dict()
 
 
 @bp.route("/", methods=["POST"])
@@ -78,24 +62,14 @@ def create_ai():
     validate(request.json)
     assert request.json
 
-    database = get_db()
     name = request.json["name"]
-    input_keys = json.dumps(request.json["input_keys"])
-    chain = json.dumps(request.json["chain"])
-    ai_id = database.execute(
-        "INSERT INTO ai (name, input_keys, chain) VALUES (?, ?, ?)",
-        (name, input_keys, chain),
-    ).lastrowid
-    database.commit()
+    input_keys = request.json["input_keys"]
+    chain = request.json["chain"]
+    new_ai = Ai(name=name, input_keys=input_keys, chain=chain)
+    db.session.add(new_ai)
+    db.session.commit()
     return (
-        jsonify(
-            {
-                "id": ai_id,
-                "name": name,
-                "input_keys": request.json["input_keys"],
-                "chain": request.json["chain"],
-            }
-        ),
+        jsonify(new_ai.as_dict()),
         201,
     )
 
@@ -107,15 +81,15 @@ def update_ai(ai_id):
     validate(request.json)
     assert request.json
 
-    database = get_db()
     name = request.json["name"]
-    input_keys = json.dumps(request.json["input_keys"])
-    chain = json.dumps(request.json["chain"])
-    database.execute(
-        "UPDATE ai SET name = ?, input_keys = ?, chain = ? WHERE id = ?",
-        (name, input_keys, chain, ai_id),
-    )
-    database.commit()
+    input_keys = request.json["input_keys"]
+    chain = request.json["chain"]
+
+    existing_ai = db.get_or_404(Ai, ai_id)
+    existing_ai.name = name
+    existing_ai.input_keys = input_keys
+    existing_ai.chain = chain
+    db.session.commit()
     reset_global_chain(ai_id)
     return jsonify(
         {
@@ -131,8 +105,8 @@ def update_ai(ai_id):
 @login_required
 def delete_ai(ai_id):
     """Delete an AI."""
-    database = get_db()
-    database.execute("DELETE FROM ai WHERE id = ?", (ai_id,))
-    database.commit()
+    existing_ai = db.get_or_404(Ai, ai_id)
+    db.session.delete(existing_ai)
+    db.session.commit()
     reset_global_chain(ai_id)
     return ("", 204)

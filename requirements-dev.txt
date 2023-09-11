@@ -3,6 +3,8 @@
 # Required dependencies (see setup.py -> install_requires)
 flask
 flask-socketio
+Flask-SQLAlchemy
+Flask-Migrate
 langchain
 
 # Required if you want to use knowledge
@@ -44,6 +46,7 @@ coverage
 black
 build
 twine
+pipdeptree
 
 # Optional dependencies to run as a production server
 gunicorn

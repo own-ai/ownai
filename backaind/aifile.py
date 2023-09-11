@@ -1,7 +1,10 @@
 """Functions to read and validate Aifiles."""
 import json
+
 import click
-from backaind.db import get_db
+
+from .extensions import db
+from .models import Ai
 
 MAX_AIFILEVERSION = 1
 
@@ -63,47 +66,27 @@ def read_aifile_from_path(aifile_path):
     return data
 
 
-def get_aifile_from_db(ai_id):
-    """Return the Aifile data from the database."""
-    database = get_db()
-    aifile = database.execute("SELECT * FROM ai WHERE id = ?", (ai_id,)).fetchone()
-    return aifile
-
-
-def get_all_aifiles_from_db():
-    """Return all Aifiles from the database."""
-    database = get_db()
-    aifiles = database.execute("SELECT * FROM ai").fetchall()
-    return aifiles
-
-
 @click.command("add-ai")
 @click.option("--aifile", "aifile_path", prompt="Aifile to import")
 def add_ai(aifile_path):
     """Register a new AI or update an AI with the same name."""
-    database = get_db()
     aifile = read_aifile_from_path(aifile_path)
     name = aifile["name"]
-    input_keys_json = json.dumps(list(get_input_keys(aifile)))
-    chain = json.dumps(aifile["chain"])
+    input_keys = list(get_input_keys(aifile))
+    chain = aifile["chain"]
 
-    existing_ai = database.execute(
-        "SELECT * FROM ai WHERE name = ?", (name,)
-    ).fetchone()
+    existing_ai = db.session.query(Ai).filter_by(name=name).first()
 
     if existing_ai is None:
-        database.execute(
-            "INSERT INTO ai (name, input_keys, chain) VALUES (?, ?, ?)",
-            (name, input_keys_json, chain),
-        )
-        database.commit()
+        new_ai = Ai(name=name, input_keys=input_keys, chain=chain)
+        db.session.add(new_ai)
+        db.session.commit()
         click.echo(f"Added {name}. Say hello!")
     else:
-        database.execute(
-            "UPDATE ai SET input_keys = ?, chain = ? WHERE name = ?",
-            (input_keys_json, chain, name),
-        )
-        database.commit()
+        existing_ai.input_keys = input_keys
+        existing_ai.chain = chain
+        existing_ai.name = name
+        db.session.commit()
         click.echo(f"Updated {name}. Say hello!")
 
 

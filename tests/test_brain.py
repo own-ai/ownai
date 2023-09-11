@@ -1,9 +1,11 @@
 """Test the handling of AI chains."""
 import os
 import pytest
+
 from langchain.chains.loading import load_chain_from_config
 from langchain.llms.huggingface_text_gen_inference import HuggingFaceTextGenInference
 from langchain.memory import ConversationBufferWindowMemory
+
 from backaind.aifile import read_aifile_from_path
 from backaind.brain import (
     get_chain,
@@ -14,6 +16,7 @@ from backaind.brain import (
     UpdatedEnvironment,
 )
 import backaind.brain
+from backaind.models import Ai
 
 
 def test_get_chain_loads_from_global_chain():
@@ -31,11 +34,11 @@ def test_get_chain_creates_new_chain(monkeypatch):
     """Test if the chain gets created if it doesn't exist yet."""
     reset_global_chain()
     monkeypatch.setattr(
-        "backaind.brain.get_aifile_from_db",
-        lambda _ai_id: {
-            "input_keys": '["input_text"]',
-            "chain": '{"name": "NotARealChain"}',
-        },
+        "backaind.extensions.db.get_or_404",
+        lambda _model, _model_id: Ai(
+            input_keys=["input_text"],
+            chain={"name": "NotARealChain"},
+        ),
     )
     monkeypatch.setattr("backaind.brain.load_chain_from_config", lambda chain: chain)
     (chain, _chain_input_keys) = get_chain(1)

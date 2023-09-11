@@ -1,5 +1,6 @@
 """Test the authentication."""
 import os
+
 import pytest
 from flask import g, session
 
@@ -11,7 +12,8 @@ from backaind.auth import (
     login_required,
     login_required_allow_demo,
 )
-from backaind.db import get_db
+from backaind.extensions import db
+from backaind.models import User
 
 
 def test_login(client, auth):
@@ -23,7 +25,7 @@ def test_login(client, auth):
     with client:
         client.get("/")
         assert session["user_id"] == 1
-        assert g.user["username"] == "test"
+        assert g.user.username == "test"
 
 
 @pytest.mark.parametrize(
@@ -77,8 +79,8 @@ def test_demo_user(client):
         os.environ["ENABLE_DEMO_MODE"] = "1"
         client.get("/")
         assert session["user_id"] == -1
-        assert g.user["username"] == "demo"
-        assert g.user["id"] == -1
+        assert g.user.username == "demo"
+        assert g.user.id == -1
         assert g.is_demo_user
 
         del os.environ["ENABLE_DEMO_MODE"]
@@ -156,19 +158,13 @@ def test_add_user_command(app, runner):
     username = "a-new-user"
     password = "a-password"
     with app.app_context():
-        database = get_db()
-
-        user = database.execute(
-            "SELECT * FROM user WHERE username = ?", (username,)
-        ).fetchone()
+        user = db.session.query(User).filter_by(username=username).first()
         assert user is None
 
         result = runner.invoke(add_user, input=f"{username}\n{password}\n{password}\n")
         assert "Registration successful" in result.output
 
-        user = database.execute(
-            "SELECT * FROM user WHERE username = ?", (username,)
-        ).fetchone()
+        user = db.session.query(User).filter_by(username=username).first()
         assert user is not None
 
         result = runner.invoke(add_user, input=f"{username}\n{password}\n{password}\n")

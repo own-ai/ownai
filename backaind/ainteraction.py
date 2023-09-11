@@ -1,16 +1,17 @@
 """Allow interaction with an AI."""
 from datetime import datetime
 import json
+
 from flask import Blueprint, render_template, session
 from flask_socketio import emit, disconnect
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.memory import ConversationBufferWindowMemory
 
-from backaind.aifile import get_all_aifiles_from_db
-from backaind.auth import login_required_allow_demo
-from backaind.brain import reply
-from backaind.knowledge import get_all_knowledge_entries_from_db
-from backaind.settings import get_settings
+from .auth import login_required_allow_demo
+from .brain import reply
+from .extensions import db, socketio
+from .models import Ai, Knowledge
+from .settings import get_settings
 
 bp = Blueprint("ainteraction", __name__)
 
@@ -32,23 +33,23 @@ class AinteractionCallbackHandler(BaseCallbackHandler):
 @login_required_allow_demo
 def index():
     """Render the main ainteraction view."""
-    aifiles = get_all_aifiles_from_db()
+    aifiles = db.session.query(Ai).all()
     ailist = []
     for aifile in aifiles:
         ailist.append(
             {
-                "id": aifile["id"],
-                "name": aifile["name"],
-                "input_keys": json.loads(aifile["input_keys"]),
+                "id": aifile.id,
+                "name": aifile.name,
+                "input_keys": aifile.input_keys,
             }
         )
-    knowledge_entries = get_all_knowledge_entries_from_db()
+    knowledge_entries = db.session.query(Knowledge).all()
     knowledge_list = []
     for knowledge_entry in knowledge_entries:
         knowledge_list.append(
             {
-                "id": knowledge_entry["id"],
-                "name": knowledge_entry["name"],
+                "id": knowledge_entry.id,
+                "name": knowledge_entry.name,
             }
         )
 
@@ -93,9 +94,9 @@ def handle_incoming_message(message):
         raise exception
 
 
-def init_app(app):
+def init_app(_app):
     """Register handling of incoming socket.io messages."""
-    app.extensions["socketio"].on("message")(handle_incoming_message)
+    socketio.on("message")(handle_incoming_message)
 
 
 def send_next_token(response_id: int, token_text: str):

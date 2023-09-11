@@ -1,6 +1,7 @@
 """Provide user authentication and registration."""
 import functools
 import os
+
 import click
 from flask import (
     Blueprint,
@@ -13,8 +14,11 @@ from flask import (
     session,
     url_for,
 )
+from sqlalchemy import exc
 from werkzeug.security import check_password_hash, generate_password_hash
-from backaind.db import get_db
+
+from .extensions import db
+from .models import User
 
 DEMO_USER_NAME = "demo"
 DEMO_USER_ID = -1
@@ -28,16 +32,13 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-        database = get_db()
-        user = database.execute(
-            "SELECT * FROM user WHERE username = ?", (username,)
-        ).fetchone()
+        user = db.session.query(User).filter_by(username=username).first()
 
-        if user is None or not check_password_hash(user["passhash"], password):
+        if user is None or not check_password_hash(user.passhash, password):
             flash("Incorrect username or password.", "danger")
         else:
             session.clear()
-            session["user_id"] = user["id"]
+            session["user_id"] = user.id
             return redirect(url_for("index"))
 
     return render_template("auth/login.html")
@@ -58,7 +59,7 @@ def load_logged_in_user():
 
     if user_id is None or user_id == DEMO_USER_ID:
         if os.environ.get("ENABLE_DEMO_MODE") in ("1", "true", "True"):
-            g.user = {"username": DEMO_USER_NAME, "id": DEMO_USER_ID}
+            g.user = User(username=DEMO_USER_NAME, id=DEMO_USER_ID)
             g.is_demo_user = True
             session.clear()
             session["user_id"] = DEMO_USER_ID
@@ -66,34 +67,26 @@ def load_logged_in_user():
             g.user = None
             session.pop("user_id", None)
     else:
-        g.user = (
-            get_db().execute("SELECT * FROM user WHERE id = ?", (user_id,)).fetchone()
-        )
+        g.user = db.session.get(User, user_id)
 
 
 def is_password_correct(username: str, password: str):
     """Check if the password for the given user is correct."""
-    database = get_db()
-    user = database.execute(
-        "SELECT * FROM user WHERE username = ?", (username,)
-    ).fetchone()
+    user = db.session.query(User).filter_by(username=username).first()
 
-    return user is not None and check_password_hash(user["passhash"], password)
+    return user is not None and check_password_hash(user.passhash, password)
 
 
 def set_password(username: str, password: str):
     """Set the (new) password for an user."""
-    database = get_db()
-    database.execute(
-        "UPDATE user SET passhash = ? WHERE username = ?",
-        (generate_password_hash(password), username),
-    )
-    database.commit()
+    user = db.session.query(User).filter_by(username=username).one()
+    user.passhash = generate_password_hash(password)
+    db.session.commit()
 
 
 def is_demo_user():
     """Check if the current user is the demo user."""
-    return g.user is not None and g.user["id"] == DEMO_USER_ID
+    return g.user is not None and g.user.id == DEMO_USER_ID
 
 
 def login_required(view):
@@ -139,16 +132,14 @@ def login_required_allow_demo(view):
 @click.password_option()
 def add_user(username, password):
     """Register a new user for the application."""
-    database = get_db()
-
     try:
-        database.execute(
-            "INSERT INTO user (username, passhash) VALUES (?, ?)",
-            (username, generate_password_hash(password)),
-        )
-        database.commit()
-    except database.IntegrityError as exc:
-        raise click.ClickException(f"User {username} is already registered.") from exc
+        user = User(username=username, passhash=generate_password_hash(password))
+        db.session.add(user)
+        db.session.commit()
+    except exc.IntegrityError as exception:
+        raise click.ClickException(
+            f"User {username} is already registered."
+        ) from exception
 
     click.echo(f"Registration successful. Hello {username}, nice to meet you!")
 

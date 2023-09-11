@@ -1,5 +1,4 @@
 """Provide AI data processing capabilities."""
-import json
 import os
 from threading import Lock
 from typing import Optional, Set, Tuple
@@ -9,8 +8,9 @@ from langchain.chains.loading import load_chain_from_config
 from langchain.llms.huggingface_text_gen_inference import HuggingFaceTextGenInference
 from langchain.schema import BaseMemory
 
-from backaind.aifile import get_aifile_from_db
+from backaind.extensions import db
 from backaind.knowledge import get_knowledge
+from backaind.models import Ai
 
 # pylint: disable=invalid-name
 global_chain = None
@@ -31,10 +31,10 @@ def get_chain(
         chain_id = global_chain_id
         chain_input_keys = global_chain_input_keys
         if not chain or not chain_input_keys or chain_id != ai_id:
-            aifile = get_aifile_from_db(ai_id)
-            chain_input_keys = json.loads(aifile["input_keys"])
+            aifile = db.get_or_404(Ai, ai_id)
+            chain_input_keys = aifile.input_keys
             with UpdatedEnvironment(updated_environment or {}):
-                chain = load_chain_from_config(json.loads(aifile["chain"]))
+                chain = load_chain_from_config(aifile.chain)
             set_text_generation_inference_token(chain)
             global_chain = chain
             global_chain_id = ai_id

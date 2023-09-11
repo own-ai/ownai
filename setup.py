@@ -13,6 +13,8 @@ setup(
     install_requires=[
         "flask",
         "flask-socketio",
+        "Flask-SQLAlchemy",
+        "Flask-Migrate",
         "langchain",
     ],
     long_description=(Path(__file__).parent / "README.md").read_text(),

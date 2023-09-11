@@ -2,13 +2,15 @@
 import os
 import json
 import shutil
+
 import pytest
-from backaind.db import get_db
+
+from backaind.extensions import db
 from backaind.knowledge import (
-    get_knowledge_entry_from_db,
     get_knowledge,
     reset_global_knowledge,
 )
+from backaind.models import Knowledge
 
 
 def test_auth_required(client):
@@ -73,9 +75,9 @@ def test_create_knowledge(client, auth, app):
     )
     assert json.loads(response.data)["id"] == 3
     with app.app_context():
-        entry = get_knowledge_entry_from_db(3)
-        assert entry["name"] == "Test"
-        shutil.rmtree(entry["persist_directory"])
+        entry = db.get_or_404(Knowledge, 3)
+        assert entry and entry.name == "Test"
+        shutil.rmtree(entry.persist_directory)
 
 
 def test_update_knowledge(client, auth, app):
@@ -87,19 +89,18 @@ def test_update_knowledge(client, auth, app):
     )
     assert json.loads(response.data)["name"] == "Test"
     with app.app_context():
-        entry = get_knowledge_entry_from_db(1)
-        assert entry["name"] == "Test"
+        entry = db.get_or_404(Knowledge, 1)
+        assert entry and entry.name == "Test"
 
 
 def test_update_knowledge_does_not_update_embeddings(client, auth, app):
     """Test if the embeddings type cannot be updated afterwards."""
     with app.app_context():
-        database = get_db()
-        database.execute(
-            "UPDATE knowledge SET embeddings = ?",
-            ("changed",),
-        )
-        database.commit()
+        knowledge = db.session.get(Knowledge, 1)
+        assert knowledge
+        knowledge.embeddings = "changed"
+        db.session.commit()
+
         auth.login()
         response = client.put(
             "/api/knowledge/1",
@@ -119,7 +120,7 @@ def test_delete_knowledge(client, auth, app):
     response = client.delete("/api/knowledge/1")
     assert response.status_code == 204
     with app.app_context():
-        entry = get_knowledge_entry_from_db(1)
+        entry = db.session.get(Knowledge, 1)
         assert entry is None
 
 

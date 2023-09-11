@@ -16,6 +16,7 @@ For a demo installation and a managed private cloud service, please visit [https
 - [Development setup](#development-setup)
 - [Usage](#usage)
 - [AI files](#ai-files)
+- [Updating](#updating)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -91,7 +92,7 @@ pip install -r requirements.txt
 6. Initialize the database:
 
 ```
-flask init-db
+flask db upgrade
 ```
 
 7. Register a new user:
@@ -166,6 +167,16 @@ If you want to get started quickly and run your AIs by yourself, please have a l
 These allow you to run your own AIs on your machine with little or no further setup.
 
 If you want to create your own aifiles, have a look at the [aifilemaker.py](./aifilemaker.py) script, which you can use as a starting point.
+
+## Updating
+
+To update ownAI, simply pull the latest changes from the repository and run:
+
+```
+source venv/bin/activate
+pip install -r requirements.txt
+flask db upgrade
+```
 
 ## Contributing
 

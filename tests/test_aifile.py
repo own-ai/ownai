@@ -3,14 +3,13 @@ import pytest
 
 from backaind.aifile import (
     add_ai,
-    get_aifile_from_db,
-    get_all_aifiles_from_db,
     get_input_keys,
     read_aifile_from_path,
     validate_aifile,
     InvalidAifileError,
 )
-from backaind.db import get_db
+from backaind.extensions import db
+from backaind.models import Ai
 
 
 @pytest.mark.parametrize(
@@ -77,39 +76,22 @@ def test_read_aifile_from_path_returns_aifile():
     assert "OpenAssistant" in aifile["name"]
 
 
-def test_get_aifile_from_db_returns_entry(app):
-    """Test if get_aifile_from_db() returns an entry from the database."""
-    with app.app_context():
-        entry = get_aifile_from_db(1)
-        assert entry["name"] == "OpenAssistant SFT-4 12B @HuggingFace-Hub"
-
-
-def test_get_all_aifiles_from_db_returns_all_entries(app):
-    """Test if get_all_aifiles_from_db() returns all entries from the database."""
-    with app.app_context():
-        entries = get_all_aifiles_from_db()
-        assert len(entries) == 2
-
-
 def test_add_ai_command_adds_ai(app, runner):
     """Test if the add-ai command adds a new AI to the database."""
     ai_file = "examples/huggingface_hub/OpenAssistant_SFT-4_12B.aifile"
     ai_name = "OpenAssistant SFT-4 12B @HuggingFace-Hub"
     with app.app_context():
-        database = get_db()
-        database.execute("DELETE FROM ai")
+        existing_ai = db.session.query(Ai).filter_by(name=ai_name).first()
+        db.session.delete(existing_ai)
+        db.session.commit()
 
-        ai_entry = database.execute(
-            "SELECT * FROM ai WHERE name = ?", (ai_name,)
-        ).fetchone()
+        ai_entry = db.session.query(Ai).filter_by(name=ai_name).first()
         assert ai_entry is None
 
         result = runner.invoke(add_ai, input=f"{ai_file}\n")
         assert f"Added {ai_name}" in result.output
 
-        ai_entry = database.execute(
-            "SELECT * FROM ai WHERE name = ?", (ai_name,)
-        ).fetchone()
+        ai_entry = db.session.query(Ai).filter_by(name=ai_name).first()
         assert ai_entry is not None
 
 
@@ -118,18 +100,12 @@ def test_add_ai_command_updates_ai(app, runner):
     ai_file = "examples/huggingface_hub/OpenAssistant_SFT-4_12B.aifile"
     ai_name = "OpenAssistant SFT-4 12B @HuggingFace-Hub"
     with app.app_context():
-        database = get_db()
-        database.execute("UPDATE ai SET chain = 'old_chain' WHERE name = ?", (ai_name,))
-
-        ai_entry = database.execute(
-            "SELECT * FROM ai WHERE name = ?", (ai_name,)
-        ).fetchone()
-        assert ai_entry["chain"] == "old_chain"
+        ai_entry = db.session.query(Ai).filter_by(name=ai_name).one()
+        ai_entry.chain = "old_chain"
+        db.session.commit()
 
         result = runner.invoke(add_ai, input=f"{ai_file}\n")
         assert f"Updated {ai_name}" in result.output
 
-        ai_entry = database.execute(
-            "SELECT * FROM ai WHERE name = ?", (ai_name,)
-        ).fetchone()
-        assert ai_entry["chain"] != "old_chain"
+        ai_entry = db.session.query(Ai).filter_by(name=ai_name).one()
+        assert ai_entry.chain != "old_chain"

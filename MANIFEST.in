@@ -1,4 +1,3 @@
-include backaind/schema.sql
 graft backaind/static
 graft backaind/templates
 global-exclude *.pyc
