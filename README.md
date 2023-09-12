@@ -9,14 +9,13 @@ For a demo installation and a managed private cloud service, please visit [https
 ## Table of Contents
 
 - [Features](#features)
-- [Quick start](#quick-start)
-- [Run with Docker](#run-with-docker)
 - [Installation](#installation)
 - [Production setup](#production-setup)
 - [Development setup](#development-setup)
 - [Usage](#usage)
 - [AI files](#ai-files)
 - [Updating](#updating)
+- [Run with Docker](#run-with-docker)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -27,36 +26,6 @@ For a demo installation and a managed private cloud service, please visit [https
 - Support for AI customization to suit specific needs
 - Create and manage additional knowledge for AIs
 - Open-source and community-driven
-
-## Quick start
-
-To get started quickly, clone this repository to your Linux server and execute:
-
-```
-./ownai-server.sh
-```
-
-This will guide you through the installation process and start the server.
-For a detailed installation guide, please refer to the following sections.
-
-## Run with Docker
-
-If you have Docker installed, you can run ownAI in a Docker container.
-Otherwise please proceed to the [installation](#installation) section.
-
-To run ownAI with Docker, first configure the server by downloading the `.env.template` file.
-Rename the file to `docker.env` and edit the file.
-Then run the following command (replace `<your-username>` and `<your-password>`):
-
-```
-docker run --name ownai --env OWNAI_ROOT_USER=<your-username> --env OWNAI_ROOT_PASSWORD=<your-password> --env-file ./docker.env -p 5000:5000 ownai/ownai
-```
-
-This is only required for the first run. To start the server again just run:
-
-```
-docker start ownai
-```
 
 ## Installation
 
@@ -176,6 +145,25 @@ To update ownAI, simply pull the latest changes from the repository and run:
 source venv/bin/activate
 pip install -r requirements.txt
 flask db upgrade
+```
+
+## Run with Docker
+
+If you have Docker installed, you can run ownAI in a Docker container.
+Otherwise please follow the [installation](#installation) section.
+
+To run ownAI with Docker, first configure the server by downloading the `.env.template` file.
+Rename the file to `docker.env` and edit the file.
+Then run the following command (replace `<your-username>` and `<your-password>`):
+
+```
+docker run --name ownai --env OWNAI_ROOT_USER=<your-username> --env OWNAI_ROOT_PASSWORD=<your-password> --env-file ./docker.env -p 5000:5000 ownai/ownai
+```
+
+This is only required for the first run. To start the server again just run:
+
+```
+docker start ownai
 ```
 
 ## Contributing

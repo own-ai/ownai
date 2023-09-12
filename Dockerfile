@@ -5,7 +5,7 @@ COPY examples examples
 COPY requirements.txt .
 COPY setup.py .
 COPY README.md .
-COPY ownai-server.sh .
+COPY docker-entrypoint.sh .
 RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5000
-CMD ["./ownai-server.sh"]
+CMD ["./docker-entrypoint.sh"]
