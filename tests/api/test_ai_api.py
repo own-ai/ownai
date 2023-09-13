@@ -118,6 +118,14 @@ def test_delete_ai(client, auth, app):
             {"name": "Test", "input_keys": [], "chain": []},
             'The property "chain" has to be a chain object.',
         ),
+        (
+            {"name": "Test", "input_keys": [], "chain": {}, "input_labels": "Test"},
+            'The property "input_labels" has to be an object assigning input keys to labels.',
+        ),
+        (
+            {"name": "Test", "input_keys": [], "chain": {}, "greeting": True},
+            'The property "greeting" has to be a string.',
+        ),
     ),
 )
 def test_validation(client, auth, data, message):

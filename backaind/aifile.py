@@ -73,18 +73,28 @@ def add_ai(aifile_path):
     aifile = read_aifile_from_path(aifile_path)
     name = aifile["name"]
     input_keys = list(get_input_keys(aifile))
+    input_labels = aifile.get("input_labels")
     chain = aifile["chain"]
+    greeting = aifile.get("greeting")
 
     existing_ai = db.session.query(Ai).filter_by(name=name).first()
 
     if existing_ai is None:
-        new_ai = Ai(name=name, input_keys=input_keys, chain=chain)
+        new_ai = Ai(
+            name=name,
+            input_keys=input_keys,
+            input_labels=input_labels,
+            chain=chain,
+            greeting=greeting,
+        )
         db.session.add(new_ai)
         db.session.commit()
         click.echo(f"Added {name}. Say hello!")
     else:
         existing_ai.input_keys = input_keys
+        existing_ai.input_labels = input_labels
         existing_ai.chain = chain
+        existing_ai.greeting = greeting
         existing_ai.name = name
         db.session.commit()
         click.echo(f"Updated {name}. Say hello!")

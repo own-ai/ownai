@@ -41,6 +41,8 @@ def index():
                 "id": aifile.id,
                 "name": aifile.name,
                 "input_keys": aifile.input_keys,
+                "input_labels": aifile.input_labels,
+                "greeting": aifile.greeting,
             }
         )
     knowledge_entries = db.session.query(Knowledge).all()

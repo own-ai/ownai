@@ -30,12 +30,28 @@ def validate(ai_json):
                 400,
             )
         )
+    if "input_labels" in ai_json and not isinstance(ai_json["input_labels"], dict):
+        abort(
+            make_response(
+                jsonify(
+                    error='The property "input_labels" has to be an object'
+                    + " assigning input keys to labels."
+                ),
+                400,
+            )
+        )
     if not "chain" in ai_json:
         abort(make_response(jsonify(error='The property "chain" is required.'), 400))
     if not isinstance(ai_json["chain"], dict):
         abort(
             make_response(
                 jsonify(error='The property "chain" has to be a chain object.'), 400
+            )
+        )
+    if "greeting" in ai_json and not isinstance(ai_json["greeting"], str):
+        abort(
+            make_response(
+                jsonify(error='The property "greeting" has to be a string.'), 400
             )
         )
 
@@ -64,8 +80,16 @@ def create_ai():
 
     name = request.json["name"]
     input_keys = request.json["input_keys"]
+    input_labels = request.json.get("input_labels")
     chain = request.json["chain"]
-    new_ai = Ai(name=name, input_keys=input_keys, chain=chain)
+    greeting = request.json.get("greeting")
+    new_ai = Ai(
+        name=name,
+        input_keys=input_keys,
+        input_labels=input_labels,
+        chain=chain,
+        greeting=greeting,
+    )
     db.session.add(new_ai)
     db.session.commit()
     return (
@@ -83,22 +107,19 @@ def update_ai(ai_id):
 
     name = request.json["name"]
     input_keys = request.json["input_keys"]
+    input_labels = request.json.get("input_labels")
     chain = request.json["chain"]
+    greeting = request.json.get("greeting")
 
     existing_ai = db.get_or_404(Ai, ai_id)
     existing_ai.name = name
     existing_ai.input_keys = input_keys
+    existing_ai.input_labels = input_labels
     existing_ai.chain = chain
+    existing_ai.greeting = greeting
     db.session.commit()
     reset_global_chain(ai_id)
-    return jsonify(
-        {
-            "id": ai_id,
-            "name": name,
-            "input_keys": request.json["input_keys"],
-            "chain": request.json["chain"],
-        }
-    )
+    return existing_ai.as_dict()
 
 
 @bp.route("/<int:ai_id>", methods=["DELETE"])

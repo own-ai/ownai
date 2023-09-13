@@ -72,6 +72,7 @@ import { indentationMarkers } from "@replit/codemirror-indentation-markers";
 import Workshop from "./Workshop.vue";
 import NewAiDropdown from "./ai/NewAiDropdown.vue";
 import type { Ai } from "@/types/Ai";
+import type { Aifile } from "@/types/Aifile";
 import type { IdName } from "@/types/IdName";
 import type { Optional } from "@/types/Optional";
 
@@ -94,15 +95,18 @@ const aiToJson = (ai: Ai | undefined) => {
   if (!ai) {
     return "";
   }
-  return JSON.stringify(
-    {
-      name: ai.name,
-      aifileversion: 1,
-      chain: ai.chain,
-    },
-    null,
-    2
-  );
+  const aifile: Aifile = {
+    name: ai.name,
+    aifileversion: 1,
+    chain: ai.chain,
+  };
+  if (ai.input_labels) {
+    aifile["input_labels"] = ai.input_labels;
+  }
+  if (ai.greeting) {
+    aifile["greeting"] = ai.greeting;
+  }
+  return JSON.stringify(aifile, null, 2);
 };
 
 const jsonToAi = (id: number | undefined, jsonString: string) => {
@@ -133,6 +137,12 @@ const jsonToAi = (id: number | undefined, jsonString: string) => {
     input_keys: Array.from(inputKeys),
     chain: json["chain"],
   };
+  if (json["input_labels"]) {
+    ai.input_labels = json["input_labels"];
+  }
+  if (json["greeting"]) {
+    ai.greeting = json["greeting"];
+  }
   if (id !== undefined) {
     ai.id = id;
   }

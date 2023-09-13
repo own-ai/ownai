@@ -1,4 +1,9 @@
 <template>
+  <div v-if="greeting" class="card mb-2 bg-light">
+    <div class="card-body">
+      {{ greeting }}
+    </div>
+  </div>
   <div
     v-for="message in messages"
     class="card mb-2"
@@ -20,7 +25,8 @@
 <script setup lang="ts">
 import type { Message } from "@/types/ainteraction/Message";
 
-const { messages } = defineProps<{
+const { greeting, messages } = defineProps<{
+  greeting?: string;
   messages: Message[];
 }>();
 const emit = defineEmits(["clear-messages"]);

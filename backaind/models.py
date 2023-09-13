@@ -20,7 +20,9 @@ class Ai(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False)
     input_keys = db.Column(db.JSON, nullable=False)
+    input_labels = db.Column(db.JSON, nullable=True)
     chain = db.Column(db.JSON, nullable=False)
+    greeting = db.Column(db.String, nullable=True)
 
     def as_dict(self):
         """Return the model as a dictionary"""
@@ -28,7 +30,9 @@ class Ai(db.Model):
             "id": self.id,
             "name": self.name,
             "input_keys": self.input_keys,
+            "input_labels": self.input_labels,
             "chain": self.chain,
+            "greeting": self.greeting,
         }
 
 

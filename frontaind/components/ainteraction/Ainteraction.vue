@@ -10,9 +10,14 @@
     :disabled="selectionDisabled"
     @select-knowledge="selectKnowledge"
   />
-  <MessageHistory :messages="messages" @clear-messages="clearMessages" />
+  <MessageHistory
+    :greeting="selectedAi?.greeting"
+    :messages="messages"
+    @clear-messages="clearMessages"
+  />
   <MessageInput
     v-if="selectedAi && (!needsKnowledge || selectedKnowledge)"
+    :label="textInputLabel"
     @send-message="sendMessage"
   />
 </template>
@@ -49,6 +54,9 @@ const selectKnowledge = (knowledge: BasicKnowledge) => {
 
 const needsKnowledge = computed(
   () => !!selectedAi.value?.input_keys.includes("input_knowledge")
+);
+const textInputLabel = computed(
+  () => selectedAi.value?.input_labels?.input_text || "Send a message"
 );
 const selectionDisabled = ref<boolean>(false);
 

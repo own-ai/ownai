@@ -6,7 +6,7 @@
     <textarea
       class="form-control"
       v-model="messageInput"
-      placeholder="Send a message"
+      :placeholder="label"
       required
       @keydown="checkForSubmit"
     ></textarea>
@@ -29,6 +29,10 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+
+const { label } = defineProps<{
+  label: string;
+}>();
 
 const messageInput = ref("");
 const emit = defineEmits(["send-message"]);
