@@ -3,7 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% block title %}{% endblock %} - ownAI</title>
+    <title>
+      {% block title %}{% endblock %} - {{ config.BRAND|default('ownAI') }}
+    </title>
     {% block main_stylesheets %}
       {% if g.vite_dev_server_enabled %}
         <link
@@ -30,7 +32,7 @@
             href="/"
             class="navbar-brand fw-bold d-flex align-items-center col-lg-4 link-body-emphasis text-decoration-none"
           >
-            ownAI
+            {{ config.BRAND|default('ownAI') }}
           </a>
         {% endif %}
         <div class="d-flex gap-3">
