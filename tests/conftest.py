@@ -111,6 +111,7 @@ def insert_test_data():
                     "_type": "llm_chain"
                 }"""
             ),
+            is_public=True,
         )
     )
     db.session.add(
@@ -172,6 +173,7 @@ def insert_test_data():
             embeddings="huggingface",
             chunk_size=500,
             persist_directory="instance/test-knowledge-1",
+            is_public=True,
         )
     )
     db.session.add(

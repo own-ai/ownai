@@ -20,8 +20,6 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from .extensions import db
 from .models import User
 
-DEMO_USER_NAME = "demo"
-DEMO_USER_ID = -1
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -55,17 +53,9 @@ def logout():
 def load_logged_in_user():
     """Load the current user and add it to the global g instance."""
     user_id = session.get("user_id")
-    g.is_demo_user = False
 
-    if user_id is None or user_id == DEMO_USER_ID:
-        if os.environ.get("ENABLE_DEMO_MODE") in ("1", "true", "True"):
-            g.user = User(username=DEMO_USER_NAME, id=DEMO_USER_ID)
-            g.is_demo_user = True
-            session.clear()
-            session["user_id"] = DEMO_USER_ID
-        else:
-            g.user = None
-            session.pop("user_id", None)
+    if user_id is None:
+        g.user = None
     else:
         g.user = db.session.get(User, user_id)
 
@@ -84,35 +74,10 @@ def set_password(username: str, password: str):
     db.session.commit()
 
 
-def is_demo_user():
-    """Check if the current user is the demo user."""
-    return g.user is not None and g.user.id == DEMO_USER_ID
-
-
 def login_required(view):
-    """
-    Wrap a view to instead redirect to login page if the user is not logged in
-    or is the demo user.
-    For API requests, this does not redirect, but returns a 401 Unauthorized status code.
-    """
-
-    @functools.wraps(view)
-    def wrapped_view(**kwargs):
-        if g.get("user") is None or is_demo_user():
-            if request.path.startswith("/api/"):
-                abort(401)
-            return redirect(url_for("auth.login"))
-
-        return view(**kwargs)
-
-    return wrapped_view
-
-
-def login_required_allow_demo(view):
     """
     Wrap a view to instead redirect to login page if the user is not logged in.
     For API requests, this does not redirect, but returns a 401 Unauthorized status code.
-    This allows the demo user to access the view.
     """
 
     @functools.wraps(view)

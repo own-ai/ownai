@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { throwOnFetchError, throwOnDemoUser } from "@/helpers/fetch";
+import { throwOnFetchError } from "@/helpers/fetch";
 import type { Knowledge } from "@/types/Knowledge";
 
 export const useKnowledgeStore = defineStore({
@@ -18,7 +18,6 @@ export const useKnowledgeStore = defineStore({
     },
 
     async createKnowledge(newKnowledge: Omit<Knowledge, "id">) {
-      throwOnDemoUser();
       const response = await fetch("/api/knowledge/", {
         method: "POST",
         headers: {
@@ -33,7 +32,6 @@ export const useKnowledgeStore = defineStore({
     },
 
     async updateKnowledge(updatedKnowledge: Knowledge) {
-      throwOnDemoUser();
       const response = await fetch(`/api/knowledge/${updatedKnowledge.id}`, {
         method: "PUT",
         headers: {
@@ -53,7 +51,6 @@ export const useKnowledgeStore = defineStore({
     },
 
     async deleteKnowledge(knowledgeId: number) {
-      throwOnDemoUser();
       const response = await fetch(`/api/knowledge/${knowledgeId}`, {
         method: "DELETE",
       });

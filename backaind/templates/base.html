@@ -21,14 +21,18 @@
     {% endblock %}
   </head>
   <body class="h-100 d-flex flex-column">
-    {% if g.is_demo_user %}
-      <script>
-        window.isDemoUser = true;
-      </script>
-    {% endif %}
     <nav class="navbar border-bottom">
       <div class="container-fluid">
-        {% include '_includes/main_menu.html' %}
+        {% if g.user %}
+          {% include '_includes/main_menu.html' %}
+        {% else %}
+          <a
+            href="/"
+            class="navbar-brand fw-bold d-flex align-items-center col-lg-4 link-body-emphasis text-decoration-none"
+          >
+            ownAI
+          </a>
+        {% endif %}
         <div class="d-flex gap-3">
           {% if g.user %}
             {% include '_includes/user_menu.html' %}

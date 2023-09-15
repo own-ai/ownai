@@ -82,24 +82,6 @@ def test_password_change_fails_on_too_short_password(auth, app, client):
         assert is_password_correct("test", "test")
 
 
-def test_password_change_fails_for_demo_user(client):
-    """Test whether the password does not get changed for the demo user."""
-    with client:
-        os.environ["ENABLE_DEMO_MODE"] = "1"
-        response = client.post(
-            "/settings/password",
-            data={
-                "current-password": "test",
-                "new-password": "a" * 10,
-                "new-password-confirmation": "a" * 10,
-            },
-        )
-        assert b"You cannot change the password of the demo user." in response.data
-        assert not is_password_correct("test", "a" * 10)
-        assert not is_password_correct("demo", "a" * 10)
-        del os.environ["ENABLE_DEMO_MODE"]
-
-
 def test_password_change_works(auth, app, client):
     """Test whether the password change works."""
     with app.app_context():
@@ -126,24 +108,6 @@ def test_get_external_providers_page(client, auth):
     auth.login()
     response = client.get("/settings/external-providers")
     assert b"<h3>Connect to external AI providers</h3>" in response.data
-
-
-def test_save_external_providers_fails_for_demo_user(client):
-    """Test whether external providers do not get saved for the demo user."""
-    with client:
-        os.environ["ENABLE_DEMO_MODE"] = "1"
-        response = client.post(
-            "/settings/external-providers",
-            data={
-                EXTERNAL_PROVIDER_ENVVARS[0]: "test",
-            },
-        )
-        assert (
-            b"You cannot change the external providers settings of the demo user."
-            in response.data
-        )
-        assert get_settings(-1).get("external-providers", {}) == {}
-        del os.environ["ENABLE_DEMO_MODE"]
 
 
 def test_save_external_providers(auth, client):

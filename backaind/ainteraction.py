@@ -2,12 +2,11 @@
 from datetime import datetime
 import json
 
-from flask import Blueprint, render_template, session
+from flask import Blueprint, render_template, session, g, redirect, url_for
 from flask_socketio import emit, disconnect
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.memory import ConversationBufferWindowMemory
 
-from .auth import login_required_allow_demo
 from .brain import reply
 from .extensions import db, socketio
 from .models import Ai, Knowledge
@@ -30,47 +29,40 @@ class AinteractionCallbackHandler(BaseCallbackHandler):
 
 
 @bp.route("/")
-@login_required_allow_demo
 def index():
     """Render the main ainteraction view."""
-    aifiles = db.session.query(Ai).all()
-    ailist = []
-    for aifile in aifiles:
-        ailist.append(
-            {
-                "id": aifile.id,
-                "name": aifile.name,
-                "input_keys": aifile.input_keys,
-                "input_labels": aifile.input_labels,
-                "greeting": aifile.greeting,
-            }
-        )
-    knowledge_entries = db.session.query(Knowledge).all()
-    knowledge_list = []
-    for knowledge_entry in knowledge_entries:
-        knowledge_list.append(
-            {
-                "id": knowledge_entry.id,
-                "name": knowledge_entry.name,
-            }
-        )
+    is_public = g.get("user") is None
+    ais = get_ai_data(only_public=is_public)
+
+    if is_public and not ais:
+        return redirect(url_for("auth.login"))
 
     return render_template(
         "ainteraction/index.html",
-        ais=json.dumps(ailist),
-        knowledges=json.dumps(knowledge_list),
+        ais=json.dumps(ais),
+        knowledges=json.dumps(get_knowledge_data(only_public=is_public)),
     )
 
 
 def handle_incoming_message(message):
     """Handle an incoming socket.io message from a user."""
-    if not session.get("user_id"):
+    is_public = session.get("user_id") is None
+    ai_id = message.get("aiId")
+    knowledge_id = message.get("knowledgeId")
+
+    if not ai_id:
+        disconnect()
+        return
+
+    if is_public and not is_ai_public(ai_id):
+        disconnect()
+        return
+
+    if is_public and knowledge_id and not is_knowledge_public(knowledge_id):
         disconnect()
         return
 
     response_id = message.get("responseId")
-    ai_id = message.get("aiId")
-    knowledge_id = message.get("knowledgeId")
     message_text = message.get("message", {}).get("text", "")
 
     memory = ConversationBufferWindowMemory(k=3)
@@ -99,6 +91,49 @@ def handle_incoming_message(message):
 def init_app(_app):
     """Register handling of incoming socket.io messages."""
     socketio.on("message")(handle_incoming_message)
+
+
+def get_ai_data(only_public=True):
+    """Get data for all AIs."""
+    ai_query = db.session.query(Ai)
+    if only_public:
+        ai_query = ai_query.filter_by(is_public=True)
+    return [
+        {
+            "id": ai.id,
+            "name": ai.name,
+            "input_keys": ai.input_keys,
+            "input_labels": ai.input_labels,
+            "greeting": ai.greeting,
+        }
+        for ai in ai_query.all()
+    ]
+
+
+def get_knowledge_data(only_public=True):
+    """Get data for all knowledges."""
+    knowledge_query = db.session.query(Knowledge)
+    if only_public:
+        knowledge_query = knowledge_query.filter_by(is_public=True)
+    return [
+        {
+            "id": knowledge.id,
+            "name": knowledge.name,
+        }
+        for knowledge in knowledge_query.all()
+    ]
+
+
+def is_ai_public(ai_id: int):
+    """Check if an AI is public."""
+    ai = db.session.get(Ai, ai_id)
+    return bool(ai and ai.is_public)
+
+
+def is_knowledge_public(knowledge_id: int):
+    """Check if a knowledge is public."""
+    knowledge = db.session.get(Knowledge, knowledge_id)
+    return bool(knowledge and knowledge.is_public)
 
 
 def send_next_token(response_id: int, token_text: str):

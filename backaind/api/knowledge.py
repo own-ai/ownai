@@ -8,7 +8,7 @@ from flask import Blueprint, jsonify, request, make_response, abort, current_app
 from langchain.document_loaders.base import BaseLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-from ..auth import login_required, login_required_allow_demo
+from ..auth import login_required
 from ..extensions import db
 from ..knowledge import (
     add_to_knowledge,
@@ -48,14 +48,14 @@ def validate(knowledge_json):
 
 
 @bp.route("/", methods=["GET"])
-@login_required_allow_demo
+@login_required
 def get_all_knowledge():
     """Get all knowledge."""
     return [knowledge.as_dict() for knowledge in db.session.query(Knowledge).all()]
 
 
 @bp.route("/<int:knowledge_id>", methods=["GET"])
-@login_required_allow_demo
+@login_required
 def get_knowledge(knowledge_id):
     """Get a specific knowledge entry."""
     knowledge = db.get_or_404(Knowledge, knowledge_id)

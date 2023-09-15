@@ -25,26 +25,6 @@ def test_auth_required(client):
     assert client.delete("/api/knowledge/1").status_code == 401
 
 
-def test_demo_user_can_read(client):
-    """Test whether the demo user can access the read endpoints."""
-    os.environ["ENABLE_DEMO_MODE"] = "1"
-    assert client.get("/api/knowledge/").status_code == 200
-    assert client.get("/api/knowledge/2").status_code == 200
-    del os.environ["ENABLE_DEMO_MODE"]
-
-
-def test_demo_user_cannot_write(client):
-    """Test whether the demo user cannot access the write endpoints."""
-    os.environ["ENABLE_DEMO_MODE"] = "1"
-    assert client.post("/api/knowledge/", json={}).status_code == 401
-    assert client.post("/api/knowledge/1/document/txt", data={}).status_code == 401
-    assert client.post("/api/knowledge/1/document/pdf", data={}).status_code == 401
-    assert client.post("/api/knowledge/1/document/docx", data={}).status_code == 401
-    assert client.put("/api/knowledge/1", json={}).status_code == 401
-    assert client.delete("/api/knowledge/1").status_code == 401
-    del os.environ["ENABLE_DEMO_MODE"]
-
-
 def test_get_all_knowledge(client, auth):
     """Test if GET /api/knowledge/ returns all knowledge from the database."""
     auth.login()

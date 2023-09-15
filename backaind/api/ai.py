@@ -1,7 +1,7 @@
 """API to create, read, update and delete AIs."""
 from flask import Blueprint, jsonify, request, make_response, abort
 
-from ..auth import login_required, login_required_allow_demo
+from ..auth import login_required
 from ..brain import reset_global_chain
 from ..extensions import db
 from ..models import Ai
@@ -57,14 +57,14 @@ def validate(ai_json):
 
 
 @bp.route("/", methods=["GET"])
-@login_required_allow_demo
+@login_required
 def get_all_ais():
     """Get all AIs."""
     return [ai.as_dict() for ai in db.session.query(Ai).all()]
 
 
 @bp.route("/<int:ai_id>", methods=["GET"])
-@login_required_allow_demo
+@login_required
 def get_ai(ai_id):
     """Get a specific AI."""
     aifile = db.get_or_404(Ai, ai_id)

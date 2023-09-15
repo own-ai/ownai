@@ -23,6 +23,7 @@ class Ai(db.Model):
     input_labels = db.Column(db.JSON, nullable=True)
     chain = db.Column(db.JSON, nullable=False)
     greeting = db.Column(db.String, nullable=True)
+    is_public = db.Column(db.Boolean, nullable=False, default=False)
 
     def as_dict(self):
         """Return the model as a dictionary"""
@@ -44,6 +45,7 @@ class Knowledge(db.Model):
     embeddings = db.Column(db.String, nullable=False)
     chunk_size = db.Column(db.Integer, nullable=False)
     persist_directory = db.Column(db.String, nullable=False)
+    is_public = db.Column(db.Boolean, nullable=False, default=False)
 
     def as_dict(self):
         """Return the model as a dictionary"""

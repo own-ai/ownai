@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { throwOnFetchError, throwOnDemoUser } from "@/helpers/fetch";
+import { throwOnFetchError } from "@/helpers/fetch";
 import type { Ai } from "@/types/Ai";
 
 export const useAiStore = defineStore({
@@ -18,7 +18,6 @@ export const useAiStore = defineStore({
     },
 
     async createAi(newAi: Omit<Ai, "id">) {
-      throwOnDemoUser();
       const response = await fetch("/api/ai/", {
         method: "POST",
         headers: {
@@ -33,7 +32,6 @@ export const useAiStore = defineStore({
     },
 
     async updateAi(updatedAi: Ai) {
-      throwOnDemoUser();
       const response = await fetch(`/api/ai/${updatedAi.id}`, {
         method: "PUT",
         headers: {
@@ -51,7 +49,6 @@ export const useAiStore = defineStore({
     },
 
     async deleteAi(aiId: number) {
-      throwOnDemoUser();
       const response = await fetch(`/api/ai/${aiId}`, {
         method: "DELETE",
       });

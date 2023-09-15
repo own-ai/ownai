@@ -2,10 +2,9 @@
 from flask import Blueprint, request, flash, render_template, g
 
 from .auth import (
-    login_required_allow_demo,
+    login_required,
     is_password_correct,
     set_password,
-    is_demo_user,
 )
 from .extensions import db
 from .models import Setting
@@ -45,12 +44,10 @@ EXTERNAL_PROVIDER_ENVVARS = [
 
 
 @bp.route("/password", methods=("GET", "POST"))
-@login_required_allow_demo
+@login_required
 def password():
     """Render the password change page or change the user's password."""
-    if is_demo_user():
-        flash("You cannot change the password of the demo user.", "warning")
-    elif request.method == "POST":
+    if request.method == "POST":
         current_password = request.form["current-password"]
         new_password = request.form["new-password"]
         new_password_confirmation = request.form["new-password-confirmation"]
@@ -69,15 +66,10 @@ def password():
 
 
 @bp.route("/external-providers", methods=("GET", "POST"))
-@login_required_allow_demo
+@login_required
 def external_providers():
     """Render the external providers page or save changed external providers settings."""
-    if is_demo_user():
-        flash(
-            "You cannot change the external providers settings of the demo user.",
-            "warning",
-        )
-    elif request.method == "POST":
+    if request.method == "POST":
         for envvar in EXTERNAL_PROVIDER_ENVVARS:
             setting = (
                 db.session.query(Setting)
