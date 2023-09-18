@@ -2,6 +2,7 @@
   <AiSelection
     :ais="parsedAis"
     :disabled="selectionDisabled"
+    :selected-ai="selectedAi"
     @select-ai="selectAi"
   />
   <KnowledgeSelection
@@ -23,12 +24,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, onMounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { io } from "socket.io-client";
 import AiSelection from "./AiSelection.vue";
 import KnowledgeSelection from "./KnowledgeSelection.vue";
 import MessageHistory from "./MessageHistory.vue";
 import MessageInput from "./MessageInput.vue";
+import { slugify } from "@/helpers/slugify";
 import type { BasicAi } from "@/types/ainteraction/BasicAi";
 import type { BasicKnowledge } from "@/types/ainteraction/BasicKnowledge";
 import type { Message } from "@/types/ainteraction/Message";
@@ -45,12 +48,44 @@ const parsedKnowledges: BasicKnowledge[] = JSON.parse(knowledges);
 const selectedAi = ref<BasicAi | null>(null);
 const selectedKnowledge = ref<BasicKnowledge | null>(null);
 
+const route = useRoute();
+const router = useRouter();
+
 const selectAi = (ai: BasicAi) => {
   selectedAi.value = ai;
+  router.push({ params: { ai: slugify(ai.name) } });
 };
 const selectKnowledge = (knowledge: BasicKnowledge) => {
   selectedKnowledge.value = knowledge;
 };
+
+const selectAiFromParams = (aiParam: string | string[]) => {
+  if (!aiParam) {
+    return;
+  }
+  if (Array.isArray(aiParam)) {
+    aiParam = aiParam[0];
+  }
+
+  let ai: BasicAi | undefined;
+  const aiParamAsNumber = parseInt(aiParam);
+  if (Number.isInteger(aiParamAsNumber)) {
+    ai = parsedAis.find((ai) => ai.id === aiParamAsNumber);
+  } else {
+    ai = parsedAis.find((ai) => slugify(ai.name) === aiParam);
+  }
+
+  if (ai) {
+    selectAi(ai);
+    clearMessages();
+  }
+};
+
+onMounted(async () => {
+  selectAiFromParams(route.params.ai);
+});
+
+watch(() => route.params.ai, selectAiFromParams);
 
 const needsKnowledge = computed(
   () => !!selectedAi.value?.input_keys.includes("input_knowledge")

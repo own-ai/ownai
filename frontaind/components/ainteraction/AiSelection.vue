@@ -48,20 +48,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import type { BasicAi } from "@/types/ainteraction/BasicAi";
 
-const { ais, disabled } = defineProps<{
+const { ais, disabled, selectedAi } = defineProps<{
   ais: BasicAi[];
   disabled: boolean;
+  selectedAi: BasicAi | null;
 }>();
 
 const emit = defineEmits(["select-ai"]);
-const selectedAi = ref<BasicAi | null>(null);
 
 const selectAi = (ai: BasicAi) => {
   emit("select-ai", ai);
-  selectedAi.value = ai;
 };
 
 const usesKnowledge = (ai: BasicAi) => {
@@ -69,7 +68,7 @@ const usesKnowledge = (ai: BasicAi) => {
 };
 
 const needsKnowledge = computed(
-  () => !!selectedAi.value && usesKnowledge(selectedAi.value)
+  () => !!selectedAi && usesKnowledge(selectedAi)
 );
 
 const getAiColor = (ai: BasicAi) => {

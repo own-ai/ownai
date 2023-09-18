@@ -29,7 +29,8 @@ class AinteractionCallbackHandler(BaseCallbackHandler):
 
 
 @bp.route("/")
-def index():
+@bp.route("/<_ai>")
+def index(_ai=None):
     """Render the main ainteraction view."""
     is_public = g.get("user") is None
     ais = get_ai_data(only_public=is_public)
