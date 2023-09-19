@@ -2,6 +2,7 @@ FROM python:3.10
 WORKDIR /ownai
 COPY backaind backaind
 COPY examples examples
+COPY migrations migrations
 COPY requirements.txt .
 COPY setup.py .
 COPY README.md .
