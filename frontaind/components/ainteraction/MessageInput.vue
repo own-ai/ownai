@@ -43,7 +43,10 @@ const sendMessage = () => {
 };
 
 const checkForSubmit = (event: KeyboardEvent) => {
-  if ((event.shiftKey || event.ctrlKey) && event.code === "Enter") {
+  if (
+    (event.shiftKey || event.ctrlKey || event.metaKey) &&
+    event.code === "Enter"
+  ) {
     sendMessage();
   }
 };
