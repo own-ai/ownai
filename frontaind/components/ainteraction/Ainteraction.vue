@@ -1,26 +1,28 @@
 <template>
-  <AiSelection
-    :ais="parsedAis"
-    :disabled="selectionDisabled"
-    :selected-ai="selectedAi"
-    @select-ai="selectAi"
-  />
-  <KnowledgeSelection
-    v-if="needsKnowledge"
-    :knowledges="parsedKnowledges"
-    :disabled="selectionDisabled"
-    @select-knowledge="selectKnowledge"
-  />
-  <MessageHistory
-    :greeting="selectedAi?.greeting"
-    :messages="messages"
-    @clear-messages="clearMessages"
-  />
-  <MessageInput
-    v-if="selectedAi && (!needsKnowledge || selectedKnowledge)"
-    :label="textInputLabel"
-    @send-message="sendMessage"
-  />
+  <div class="ainteraction-container">
+    <AiSelection
+      :ais="parsedAis"
+      :disabled="selectionDisabled"
+      :selected-ai="selectedAi"
+      @select-ai="selectAi"
+    />
+    <KnowledgeSelection
+      v-if="needsKnowledge"
+      :knowledges="parsedKnowledges"
+      :disabled="selectionDisabled"
+      @select-knowledge="selectKnowledge"
+    />
+    <MessageHistory
+      :greeting="selectedAi?.greeting"
+      :messages="messages"
+      @clear-messages="clearMessages"
+    />
+    <MessageInput
+      v-if="selectedAi && (!needsKnowledge || selectedKnowledge)"
+      :label="textInputLabel"
+      @send-message="sendMessage"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -162,3 +164,10 @@ const clearMessages = () => {
   selectionDisabled.value = false;
 };
 </script>
+
+<style scoped>
+.ainteraction-container {
+  max-width: 40rem;
+  margin: 0 auto;
+}
+</style>

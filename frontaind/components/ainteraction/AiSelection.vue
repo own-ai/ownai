@@ -1,15 +1,6 @@
 <template>
-  <div
-    class="d-flex align-items-center justify-content-center gap-2"
-    :class="needsKnowledge ? 'mb-2' : 'mb-4'"
-  >
-    <div
-      :class="
-        needsKnowledge ? 'col-sm-2 col-lg-1 d-flex justify-content-end' : ''
-      "
-    >
-      <span class="badge rounded-pill text-bg-primary">AI</span>
-    </div>
+  <div class="d-flex align-items-center justify-content-center gap-2 mb-4">
+    <span class="badge rounded-pill text-bg-primary">AI</span>
     <div v-if="!ais.length" class="flex-grow-1">
       <strong
         >No AI found. Please
@@ -48,7 +39,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
 import type { BasicAi } from "@/types/ainteraction/BasicAi";
 
 const { ais, disabled, selectedAi } = defineProps<{
@@ -66,10 +56,6 @@ const selectAi = (ai: BasicAi) => {
 const usesKnowledge = (ai: BasicAi) => {
   return ai.input_keys.includes("input_knowledge");
 };
-
-const needsKnowledge = computed(
-  () => !!selectedAi && usesKnowledge(selectedAi)
-);
 
 const getAiColor = (ai: BasicAi) => {
   if (usesKnowledge(ai)) {

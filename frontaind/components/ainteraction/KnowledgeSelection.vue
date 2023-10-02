@@ -1,8 +1,8 @@
 <template>
-  <div class="d-flex align-items-center justify-content-center gap-2 mb-4">
-    <div class="col-sm-2 col-lg-1 d-flex justify-content-end">
-      <span class="badge rounded-pill text-bg-warning">Knowledge</span>
-    </div>
+  <div
+    class="d-flex align-items-center justify-content-center gap-2 mb-4 mt-n3"
+  >
+    <span class="badge rounded-pill text-bg-warning">Knowledge</span>
     <div v-if="!knowledges.length" class="flex-grow-1">
       <strong
         >This AI accesses knowledge. Please
