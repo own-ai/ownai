@@ -1,6 +1,4 @@
 """Test the authentication."""
-import os
-
 import pytest
 from flask import g, session
 

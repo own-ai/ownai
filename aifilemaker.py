@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Simple example how to quickly create Aifiles."""
 import json
-from langchain import PromptTemplate, LLMChain
+from langchain.chains import LLMChain
 from langchain.chains.loading import load_chain_from_config
 from langchain.llms.fake import FakeListLLM
+from langchain.prompts import PromptTemplate
 
 # 1. Set a name for your AI
 NAME = "Fake AI"

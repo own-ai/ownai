@@ -10,6 +10,7 @@
     "build": "vue-tsc && vite build",
     "start": "flask run --debug",
     "format": "black . && prettier --write .",
+    "lint": "pylint backaind tests *.py",
     "test": "pytest",
     "test-coverage": "coverage run -m pytest && coverage report && coverage html"
   },

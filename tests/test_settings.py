@@ -1,5 +1,4 @@
 """Test the settings blueprint."""
-import os
 import pytest
 from flask import session
 from backaind.auth import is_password_correct, set_password

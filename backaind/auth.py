@@ -1,6 +1,5 @@
 """Provide user authentication and registration."""
 import functools
-import os
 
 import click
 from flask import (
