@@ -13,6 +13,8 @@ from ..extensions import db
 from ..knowledge import (
     add_to_knowledge,
     reset_global_knowledge,
+    get_from_knowledge,
+    delete_from_knowledge,
 )
 from ..models import Knowledge
 
@@ -132,6 +134,23 @@ def delete_knowledge(knowledge_id):
     db.session.commit()
     shutil.rmtree(persist_directory)
     reset_global_knowledge(knowledge_id)
+    return ("", 204)
+
+
+@bp.route("/<int:knowledge_id>/document", methods=["GET"])
+@login_required
+def get_documents(knowledge_id):
+    """Get documents from the specific knowledge."""
+    limit = request.args.get("limit", 10, type=int)
+    offset = request.args.get("offset", 0, type=int)
+    return get_from_knowledge(knowledge_id, limit, offset)
+
+
+@bp.route("/<int:knowledge_id>/document/<string:document_id>", methods=["DELETE"])
+@login_required
+def delete_document(knowledge_id, document_id):
+    """Delete a document from a knowledge."""
+    delete_from_knowledge(knowledge_id, [document_id])
     return ("", 204)
 
 

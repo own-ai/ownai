@@ -43,15 +43,25 @@
       No knowledge set up yet.
       <a href="#" @click.prevent="create">Create knowledge</a>
     </template>
-    <FileDragDrop
+    <Tabs
       v-if="selectedKnowledgeId"
-      :knowledge-id="selectedKnowledgeId"
+      :tabs="['Add to knowledge', 'Inspect knowledge']"
+      class="mt-3"
     >
-      <h4>Add knowledge to {{ selectedKnowledge?.name }}</h4>
-      <template v-slot:success
-        ><h4>Successfully added to {{ selectedKnowledge?.name }}</h4></template
-      >
-    </FileDragDrop>
+      <template #tab0>
+        <FileDragDrop :knowledge-id="selectedKnowledgeId">
+          <h4>Add knowledge to {{ selectedKnowledge?.name }}</h4>
+          <template v-slot:success
+            ><h4>
+              Successfully added to {{ selectedKnowledge?.name }}
+            </h4></template
+          >
+        </FileDragDrop>
+      </template>
+      <template #tab1>
+        <DocumentsTable :knowledge-id="selectedKnowledgeId" />
+      </template>
+    </Tabs>
     <div
       v-else
       class="d-flex h-100 w-100 align-items-center justify-content-center"
@@ -77,7 +87,9 @@ import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter, onBeforeRouteUpdate } from "vue-router";
 import { useKnowledgeStore } from "@/store/knowledge";
 import Workshop from "./Workshop.vue";
+import Tabs from "@/components/common/Tabs.vue";
 import FileDragDrop from "./knowledge/FileDragDrop.vue";
+import DocumentsTable from "./knowledge/DocumentsTable.vue";
 import type { IdName } from "@/types/IdName";
 
 const knowledgeStore = useKnowledgeStore();

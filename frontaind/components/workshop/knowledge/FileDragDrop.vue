@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="isLoading"
-    class="d-flex justify-content-center align-items-center w-100"
+    class="d-flex justify-content-center align-items-center mt-5"
   >
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Uploading...</span>
@@ -9,7 +9,7 @@
   </div>
   <div
     v-else
-    class="d-flex flex-column justify-content-center align-items-center border-primary p-5 w-100 m-3"
+    class="d-flex flex-column justify-content-center align-items-center border-primary p-5"
     :class="{ 'bg-light': isDraggingOver }"
     @dragover.prevent="isDraggingOver = true"
     @dragenter.prevent="isDraggingOver = true"

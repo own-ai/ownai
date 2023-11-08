@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% from '_macros/assets.html' import css, js %}
+
+{% block title %}
+  Knowledge
+{% endblock %}
+
+{% block stylesheets %}
+  {{ css('workshop') }}
+{% endblock %}
+
+{% block scripts %}
+  {{ js('workshop') }}
+{% endblock %}
+
+{% block main_classes %}
+  flex-grow-1
+{% endblock %}
+
+{% block main %}
+  <div id="workshop" class="d-flex flex-column h-100"></div>
+{% endblock %}

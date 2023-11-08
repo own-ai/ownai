@@ -4,6 +4,7 @@
 """
 from typing import List
 from threading import Lock
+import uuid
 
 import click
 from langchain.docstore.document import Document
@@ -68,13 +69,33 @@ def reset_global_knowledge(knowledge_id=None):
 
 def add_to_knowledge(knowledge_id: int, documents: List[Document]):
     """Add documents to the specified knowledge."""
-    knowledge_entry = db.get_or_404(Knowledge, knowledge_id)
-    knowledge = Chroma(
-        persist_directory=knowledge_entry.persist_directory,
-        embedding_function=get_embeddings(knowledge_entry.embeddings),
+    knowledge = get_knowledge(knowledge_id)
+    knowledge.add_documents(
+        documents, ids=[str(uuid.uuid4()) for _ in range(len(documents))]
     )
-    knowledge.add_documents(documents)
-    knowledge.persist()
+
+
+def get_from_knowledge(knowledge_id: int, limit: int, offset: int):
+    """Get documents from the specified knowledge."""
+    knowledge = get_knowledge(knowledge_id)
+    assert isinstance(
+        knowledge, Chroma
+    ), "Can only get documents from Chroma vector stores."
+    total = knowledge._collection.count()  # pylint: disable=protected-access
+    collection = knowledge.get(limit=limit, offset=offset)
+    return {
+        "total": total,
+        "items": [
+            {"id": id, "text": text}
+            for id, text in zip(collection["ids"], collection["documents"])
+        ],
+    }
+
+
+def delete_from_knowledge(knowledge_id: int, document_ids: List[str]):
+    """Delete documents from the specified knowledge."""
+    knowledge = get_knowledge(knowledge_id)
+    knowledge.delete(document_ids)
 
 
 @click.command("add-knowledge")

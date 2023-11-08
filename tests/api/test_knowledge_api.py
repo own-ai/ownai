@@ -23,6 +23,8 @@ def test_auth_required(client):
     assert client.post("/api/knowledge/1/document/docx", data={}).status_code == 401
     assert client.put("/api/knowledge/1", json={}).status_code == 401
     assert client.delete("/api/knowledge/1").status_code == 401
+    assert client.get("/api/knowledge/1/document").status_code == 401
+    assert client.delete("/api/knowledge/1/document/test").status_code == 401
 
 
 def test_get_all_knowledge(client, auth):
@@ -102,6 +104,40 @@ def test_delete_knowledge(client, auth, app):
     with app.app_context():
         entry = db.session.get(Knowledge, 1)
         assert entry is None
+
+
+def test_get_documents(client, auth):
+    """Test if GET /api/knowledge/1/document returns all documents from the knowledge."""
+    with client, open("tests/test_documents/test.txt", "rb") as file:
+        auth.login()
+        client.post(
+            "/api/knowledge/1/document/txt",
+            data={"file": (file, "test.txt")},
+            buffered=True,
+            content_type="multipart/form-data",
+        )
+        response = client.get("/api/knowledge/1/document")
+        assert 1 == len(json.loads(response.data)["items"])
+        reset_global_knowledge()
+
+
+def test_delete_document(client, auth):
+    """Test if DELETE /api/knowledge/1/document/<id> deletes the document."""
+    with client, open("tests/test_documents/test.txt", "rb") as file:
+        auth.login()
+        client.post(
+            "/api/knowledge/1/document/txt",
+            data={"file": (file, "test.txt")},
+            buffered=True,
+            content_type="multipart/form-data",
+        )
+        response = client.get("/api/knowledge/1/document")
+        document_id = json.loads(response.data)["items"][0]["id"]
+        response = client.delete("/api/knowledge/1/document/" + document_id)
+        assert response.status_code == 204
+        response = client.get("/api/knowledge/1/document")
+        assert 0 == len(json.loads(response.data)["items"])
+        reset_global_knowledge()
 
 
 def test_upload_txt(client, auth):
