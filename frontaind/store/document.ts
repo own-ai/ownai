@@ -33,7 +33,7 @@ export const useDocumentStore = (knowledgeId: number) =>
         }
 
         const response = await fetch(
-          `/api/knowledge/${knowledgeId}/document?offset=${offset}&limit=${limit}`
+          `/api/knowledge/${knowledgeId}/document?offset=${offset}&limit=${limit}`,
         );
         await throwOnFetchError(response);
 
@@ -52,7 +52,7 @@ export const useDocumentStore = (knowledgeId: number) =>
           `/api/knowledge/${knowledgeId}/document/${documentId}`,
           {
             method: "DELETE",
-          }
+          },
         );
         await throwOnFetchError(response);
         this.documentPages[this.currentPage] = this.documentPages[

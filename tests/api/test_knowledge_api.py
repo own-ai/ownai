@@ -3,13 +3,11 @@ import os
 import json
 import shutil
 
+from langchain.vectorstores.chroma import Chroma
 import pytest
 
 from backaind.extensions import db
-from backaind.knowledge import (
-    get_knowledge,
-    reset_global_knowledge,
-)
+from backaind.knowledge import get_knowledge
 from backaind.models import Knowledge
 
 
@@ -97,12 +95,12 @@ def test_update_knowledge_does_not_update_embeddings(client, auth, app):
 
 def test_delete_knowledge(client, auth, app):
     """Test if DELETE /api/knowledge/1 deletes the entry."""
-    os.makedirs("instance/test-knowledge-1")
+    os.makedirs("instance/test-knowledge-2")
     auth.login()
-    response = client.delete("/api/knowledge/1")
+    response = client.delete("/api/knowledge/2")
     assert response.status_code == 204
     with app.app_context():
-        entry = db.session.get(Knowledge, 1)
+        entry = db.session.get(Knowledge, 2)
         assert entry is None
 
 
@@ -118,7 +116,11 @@ def test_get_documents(client, auth):
         )
         response = client.get("/api/knowledge/1/document")
         assert 1 == len(json.loads(response.data)["items"])
-        reset_global_knowledge()
+
+        knowledge = get_knowledge(1)
+        assert isinstance(knowledge, Chroma)
+        # pylint: disable-next=protected-access
+        knowledge._collection.delete(where_document={"$contains": "test"})
 
 
 def test_delete_document(client, auth):
@@ -137,7 +139,11 @@ def test_delete_document(client, auth):
         assert response.status_code == 204
         response = client.get("/api/knowledge/1/document")
         assert 0 == len(json.loads(response.data)["items"])
-        reset_global_knowledge()
+
+        knowledge = get_knowledge(1)
+        assert isinstance(knowledge, Chroma)
+        # pylint: disable-next=protected-access
+        knowledge._collection.delete(where_document={"$contains": "test"})
 
 
 def test_upload_txt(client, auth):
@@ -153,7 +159,10 @@ def test_upload_txt(client, auth):
         knowledge = get_knowledge(1)
         results = knowledge.similarity_search("txt")
         assert results.pop().page_content == "This is a txt test file."
-        reset_global_knowledge()
+
+        assert isinstance(knowledge, Chroma)
+        # pylint: disable-next=protected-access
+        knowledge._collection.delete(where_document={"$contains": "test"})
 
 
 def test_upload_pdf(client, auth):
@@ -169,7 +178,10 @@ def test_upload_pdf(client, auth):
         knowledge = get_knowledge(1)
         results = knowledge.similarity_search("pdf")
         assert results.pop().page_content == "This is a pdf test file."
-        reset_global_knowledge()
+
+        assert isinstance(knowledge, Chroma)
+        # pylint: disable-next=protected-access
+        knowledge._collection.delete(where_document={"$contains": "test"})
 
 
 def test_upload_docx(client, auth):
@@ -185,7 +197,10 @@ def test_upload_docx(client, auth):
         knowledge = get_knowledge(1)
         results = knowledge.similarity_search("docx")
         assert results.pop().page_content == "This is a docx test file."
-        reset_global_knowledge()
+
+        assert isinstance(knowledge, Chroma)
+        # pylint: disable-next=protected-access
+        knowledge._collection.delete(where_document={"$contains": "test"})
 
 
 def test_upload_no_file_fails(client, auth):

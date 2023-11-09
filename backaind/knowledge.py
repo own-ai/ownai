@@ -10,7 +10,7 @@ import click
 from langchain.docstore.document import Document
 from langchain.embeddings.base import Embeddings
 from langchain.vectorstores.base import VectorStore
-from langchain.vectorstores import Chroma
+from langchain.vectorstores.chroma import Chroma
 
 from .extensions import db
 from .models import Knowledge

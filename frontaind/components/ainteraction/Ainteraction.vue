@@ -90,10 +90,10 @@ onMounted(async () => {
 watch(() => route.params.ai, selectAiFromParams);
 
 const needsKnowledge = computed(
-  () => !!selectedAi.value?.input_keys.includes("input_knowledge")
+  () => !!selectedAi.value?.input_keys.includes("input_knowledge"),
 );
 const textInputLabel = computed(
-  () => selectedAi.value?.input_labels?.input_text || "Send a message"
+  () => selectedAi.value?.input_labels?.input_text || "Send a message",
 );
 const selectionDisabled = ref<boolean>(false);
 

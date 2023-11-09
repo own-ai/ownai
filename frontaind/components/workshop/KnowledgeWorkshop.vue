@@ -100,8 +100,8 @@ const router = useRouter();
 const selectedKnowledgeId = ref<number | null>();
 const selectedKnowledge = computed(() =>
   knowledgeStore.knowledges.find(
-    (knowledge) => knowledge.id === selectedKnowledgeId.value
-  )
+    (knowledge) => knowledge.id === selectedKnowledgeId.value,
+  ),
 );
 
 const selectKnowledge = (knowledge: IdName) => {
@@ -127,7 +127,7 @@ const create = async () => {
 
 const rename = async (knowledgeId: number) => {
   const knowledge = knowledgeStore.knowledges.find(
-    (knowledge) => knowledge.id === knowledgeId
+    (knowledge) => knowledge.id === knowledgeId,
   );
   const name = prompt("New name of the knowledge collection", knowledge?.name);
   if (!name) {
@@ -142,7 +142,7 @@ const rename = async (knowledgeId: number) => {
 
 const deleteKnowledge = async (knowledgeId: number) => {
   const knowledge = knowledgeStore.knowledges.find(
-    (knowledge) => knowledge.id === knowledgeId
+    (knowledge) => knowledge.id === knowledgeId,
   );
   if (!confirm(`Really delete knowledge collection "${knowledge?.name}"?`)) {
     return;

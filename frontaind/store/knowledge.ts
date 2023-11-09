@@ -42,7 +42,7 @@ export const useKnowledgeStore = defineStore({
       await throwOnFetchError(response);
       const data: Knowledge = await response.json();
       const index = this.knowledges.findIndex(
-        (knowledge) => knowledge.id === updatedKnowledge.id
+        (knowledge) => knowledge.id === updatedKnowledge.id,
       );
       if (index !== -1) {
         this.knowledges[index] = data;
@@ -56,7 +56,7 @@ export const useKnowledgeStore = defineStore({
       });
       await throwOnFetchError(response);
       this.knowledges = this.knowledges.filter(
-        (knowledge) => knowledge.id !== knowledgeId
+        (knowledge) => knowledge.id !== knowledgeId,
       );
     },
   },

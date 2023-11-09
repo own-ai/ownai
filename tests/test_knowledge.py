@@ -4,6 +4,7 @@ import pytest
 from langchain.docstore.document import Document
 from langchain.embeddings.base import Embeddings
 from langchain.vectorstores.base import VectorStore
+from langchain.vectorstores.chroma import Chroma
 
 from backaind.extensions import db
 from backaind.knowledge import (
@@ -11,7 +12,6 @@ from backaind.knowledge import (
     add_to_knowledge,
     get_embeddings,
     get_knowledge,
-    reset_global_knowledge,
     KnowledgeConfigError,
 )
 import backaind.knowledge
@@ -47,10 +47,9 @@ def test_get_knowledge_returns_vector_store(client):
 def test_get_knowledge_loads_from_global_knowledge():
     """Test if get_knowledge() loads from the global knowledge instance."""
     backaind.knowledge.global_knowledge = "NotRealKnowledge"
-    backaind.knowledge.global_knowledge_id = 1
-    knowledge = get_knowledge(1)
+    backaind.knowledge.global_knowledge_id = 999
+    knowledge = get_knowledge(999)
     assert knowledge == "NotRealKnowledge"
-    reset_global_knowledge()
 
 
 def test_add_to_knowledge_adds_documents(client):
@@ -61,9 +60,12 @@ def test_add_to_knowledge_adds_documents(client):
             1, [Document(page_content="Test Document", metadata={"source": "Test"})]
         )
         knowledge = get_knowledge(1)
-        results = knowledge.similarity_search("Test Document")
-        assert results.pop().page_content == "Test Document"
-        reset_global_knowledge()
+        result = knowledge.similarity_search("Test Document").pop()
+        assert result.page_content == "Test Document"
+
+        assert isinstance(knowledge, Chroma)
+        # pylint: disable-next=protected-access
+        knowledge._collection.delete(where_document={"$contains": "Test"})
 
 
 def test_add_knowledge_command_adds_knowledge(app, runner):

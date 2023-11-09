@@ -77,7 +77,7 @@ watch(
   () => props.knowledgeId,
   (newVal) => {
     knowledgeId.value = newVal;
-  }
+  },
 );
 
 const isDraggingOver = ref<boolean>(false);
@@ -109,19 +109,19 @@ const handleFiles = async (files: FileList) => {
       case "txt":
         await uploadFile(
           file,
-          `/api/knowledge/${knowledgeId.value}/document/txt`
+          `/api/knowledge/${knowledgeId.value}/document/txt`,
         );
         break;
       case "pdf":
         await uploadFile(
           file,
-          `/api/knowledge/${knowledgeId.value}/document/pdf`
+          `/api/knowledge/${knowledgeId.value}/document/pdf`,
         );
         break;
       case "docx":
         await uploadFile(
           file,
-          `/api/knowledge/${knowledgeId.value}/document/docx`
+          `/api/knowledge/${knowledgeId.value}/document/docx`,
         );
         break;
       default:

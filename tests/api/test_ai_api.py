@@ -1,5 +1,4 @@
 """Test the AI API."""
-import os
 import json
 import pytest
 from backaind.extensions import db

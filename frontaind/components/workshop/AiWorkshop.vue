@@ -168,7 +168,7 @@ const save = async () => {
   try {
     const json = jsonToAi(
       selectedAiId.value || undefined,
-      codemirrorView.state.doc.toString()
+      codemirrorView.state.doc.toString(),
     );
     if (json.id !== undefined) {
       await aiStore.updateAi({ ...json, id: json.id });
@@ -180,7 +180,7 @@ const save = async () => {
     if (error instanceof SyntaxError) {
       alert(
         "Cannot save the AI because its code is invalid. Please fix the code and try again.\n\nError message: " +
-          error.message
+          error.message,
       );
     } else {
       alert(error);

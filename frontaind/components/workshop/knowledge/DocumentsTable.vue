@@ -104,7 +104,7 @@ watch(
   (newVal) => {
     store.value = useDocumentStore(newVal)();
     load();
-  }
+  },
 );
 
 const deleteDocument = async (documentId: string) => {
@@ -114,6 +114,6 @@ const deleteDocument = async (documentId: string) => {
 
 const hasPrevious = computed(() => store.value.currentPage > 1);
 const hasNext = computed(
-  () => store.value.currentPage < store.value.totalPages
+  () => store.value.currentPage < store.value.totalPages,
 );
 </script>

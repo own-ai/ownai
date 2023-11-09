@@ -1,7 +1,5 @@
 """Define test configuration and fixtures."""
 import json
-import os
-import shutil
 
 import pytest
 
@@ -27,9 +25,6 @@ def fixture_app():
         insert_test_data()
 
     yield app
-
-    if os.path.exists("instance/test-knowledge-1"):
-        shutil.rmtree("instance/test-knowledge-1")
 
 
 @pytest.fixture(name="client")
