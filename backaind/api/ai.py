@@ -30,7 +30,11 @@ def validate(ai_json):
                 400,
             )
         )
-    if "input_labels" in ai_json and not isinstance(ai_json["input_labels"], dict):
+    if (
+        "input_labels" in ai_json
+        and ai_json["input_labels"]
+        and not isinstance(ai_json["input_labels"], dict)
+    ):
         abort(
             make_response(
                 jsonify(
@@ -48,7 +52,11 @@ def validate(ai_json):
                 jsonify(error='The property "chain" has to be a chain object.'), 400
             )
         )
-    if "greeting" in ai_json and not isinstance(ai_json["greeting"], str):
+    if (
+        "greeting" in ai_json
+        and ai_json["greeting"]
+        and not isinstance(ai_json["greeting"], str)
+    ):
         abort(
             make_response(
                 jsonify(error='The property "greeting" has to be a string.'), 400
