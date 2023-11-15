@@ -3,6 +3,7 @@ import pytest
 
 from backaind.aifile import (
     add_ai,
+    download_model,
     get_input_keys,
     read_aifile_from_path,
     validate_aifile,
@@ -109,3 +110,23 @@ def test_add_ai_command_updates_ai(app, runner):
 
         ai_entry = db.session.query(Ai).filter_by(name=ai_name).one()
         assert ai_entry.chain != "old_chain"
+
+
+def test_download_model_command_calls_hf_hub_download(app, runner, monkeypatch):
+    """Test if the download-model command calls the hf_hub_download function."""
+
+    class HfHubDownloadRecorder:
+        """Helper class to record function call to hf_hub_download()."""
+
+        kwargs = {}
+
+    def fake_hf_hub_download(**kwargs):
+        HfHubDownloadRecorder.kwargs = kwargs
+
+    monkeypatch.setattr("huggingface_hub.hf_hub_download", fake_hf_hub_download)
+    with app.app_context():
+        runner.invoke(download_model, input="testrepo\ntestfilename\n")
+        assert HfHubDownloadRecorder.kwargs["repo_id"] == "testrepo"
+        assert HfHubDownloadRecorder.kwargs["filename"] == "testfilename"
+        assert HfHubDownloadRecorder.kwargs["local_dir"] == app.instance_path
+        assert HfHubDownloadRecorder.kwargs["local_dir_use_symlinks"] is True

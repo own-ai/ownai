@@ -2,6 +2,7 @@
 import json
 
 import click
+from flask import current_app
 
 from .extensions import db
 from .models import Ai
@@ -100,6 +101,23 @@ def add_ai(aifile_path):
         click.echo(f"Updated {name}. Say hello!")
 
 
+@click.command("download-model")
+@click.option("--repo", "repo_id", prompt="Hugging Face Repository ID")
+@click.option("--filename", "filename", prompt="File within the repository")
+def download_model(repo_id, filename):
+    """Download a model from Hugging Face and save it to the instance folder."""
+    # pylint: disable-next=import-outside-toplevel
+    from huggingface_hub import hf_hub_download
+
+    hf_hub_download(
+        repo_id=repo_id,
+        filename=filename,
+        local_dir=current_app.instance_path,
+        local_dir_use_symlinks=True,
+    )
+
+
 def init_app(app):
     """Register CLI commands with the application instance."""
     app.cli.add_command(add_ai)
+    app.cli.add_command(download_model)
