@@ -1,8 +1,9 @@
 """Provide AI data processing capabilities."""
 import os
 from threading import Lock
-from typing import Optional, Set, Tuple
-from langchain.callbacks.base import Callbacks
+from typing import Callable, Optional, Set, Tuple
+
+from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains.base import Chain
 from langchain.chains.loading import load_chain_from_config
 from langchain.llms.huggingface_text_gen_inference import HuggingFaceTextGenInference
@@ -61,7 +62,7 @@ def reply(
     input_text: str,
     knowledge_id: Optional[int] = None,
     memory: Optional[BaseMemory] = None,
-    callbacks: Callbacks = None,
+    on_token: Callable[[str], None] = None,
     updated_environment: Optional[dict] = None,
 ) -> str:
     """Run the chain with an input message and return the AI output."""
@@ -88,7 +89,62 @@ def reply(
                 inputs["input_history"] = ""
             else:
                 inputs["input_history"] = memory.load_memory_variables({})["history"]
-    return chain(inputs, callbacks=callbacks)["output_text"]
+
+    if "gunicorn" in os.environ.get("SERVER_SOFTWARE", ""):
+        return run_chain_on_gunicorn(chain, inputs, on_token)
+    return run_chain_on_multiprocessing(chain, inputs, on_token)
+
+
+def run_chain_on_gunicorn(chain: Chain, inputs: dict, on_token: Callable[[str], None]):
+    """Run the chain with gipc in the context of gevent."""
+    # pylint: disable-next=import-outside-toplevel
+    import gipc
+
+    with gipc.pipe() as (readend, writeend):
+        gipc.start_process(
+            target=run_chain_process, args=(chain, inputs, writeend), daemon=True
+        )
+        while True:
+            result_type, text = readend.get()
+            if result_type == "token":
+                on_token(text)
+            elif result_type == "done":
+                return text
+
+
+def run_chain_on_multiprocessing(
+    chain: Chain, inputs: dict, on_token: Callable[[str], None]
+):
+    """Run the chain with multiprocessing (won't work with gevent)."""
+    # pylint: disable-next=import-outside-toplevel
+    import multiprocessing
+
+    result_queue = multiprocessing.Queue()
+    multiprocessing.Process(
+        target=run_chain_process, args=(chain, inputs, result_queue), daemon=True
+    ).start()
+    while True:
+        result_type, text = result_queue.get()
+        if result_type == "token":
+            on_token(text)
+        elif result_type == "done":
+            return text
+
+
+def run_chain_process(chain: Chain, inputs: dict, putable):
+    """Run the chain in a separate process and put the results in the putable."""
+
+    class CallbackHandler(BaseCallbackHandler):
+        """Callback handler that puts tokens in the putable as they are generated."""
+
+        def on_chat_model_start(self, serialized, messages, **kwargs):
+            pass
+
+        def on_llm_new_token(self, token: str, **kwargs) -> None:
+            putable.put(("token", token))
+
+    output_text = chain(inputs, callbacks=[CallbackHandler()])["output_text"]
+    putable.put(("done", output_text))
 
 
 def find_instances(obj, cls):

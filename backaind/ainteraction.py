@@ -4,7 +4,6 @@ import json
 
 from flask import Blueprint, render_template, session, g, redirect, url_for
 from flask_socketio import emit, disconnect
-from langchain.callbacks.base import BaseCallbackHandler
 from langchain.memory import ConversationBufferWindowMemory
 
 from .brain import reply
@@ -13,19 +12,6 @@ from .models import Ai, Knowledge
 from .settings import get_settings
 
 bp = Blueprint("ainteraction", __name__)
-
-
-class AinteractionCallbackHandler(BaseCallbackHandler):
-    """Callback handler for events during response generation."""
-
-    def __init__(self, response_id: int) -> None:
-        self.response_id = response_id
-
-    def on_chat_model_start(self, serialized, messages, **kwargs):
-        pass
-
-    def on_llm_new_token(self, token: str, **kwargs) -> None:
-        send_next_token(self.response_id, token)
 
 
 @bp.route("/")
@@ -79,7 +65,7 @@ def handle_incoming_message(message):
             message_text,
             knowledge_id,
             memory,
-            [AinteractionCallbackHandler(response_id)],
+            lambda token: send_next_token(response_id, token),
             get_settings(session.get("user_id", -1)).get("external-providers", {}),
         )
         send_response(response_id, response.strip())

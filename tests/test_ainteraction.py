@@ -2,7 +2,6 @@
 import pytest
 
 from backaind.ainteraction import (
-    AinteractionCallbackHandler,
     handle_incoming_message,
     get_ai_data,
     get_knowledge_data,
@@ -139,15 +138,22 @@ def test_handle_incoming_message(client, auth, monkeypatch):
     class EmitRecorder:
         """Helper class to record function call to emit()."""
 
-        called = 0
+        called_for_token = 0
+        called_for_message = 0
 
     def fake_disconnect():
         DisconnectRecorder.called += 1
 
-    def fake_emit(_event, _arg):
-        EmitRecorder.called += 1
+    def fake_emit(event, _arg):
+        if event == "token":
+            EmitRecorder.called_for_token += 1
+        elif event == "message":
+            EmitRecorder.called_for_message += 1
 
-    def fake_reply(*_args):
+    def fake_reply(
+        _ai_id, _input_text, _knowledge_id, _memory, on_token, _updated_environment
+    ):
+        on_token("token")
         return "Fake response"
 
     monkeypatch.setattr("backaind.ainteraction.disconnect", fake_disconnect)
@@ -167,7 +173,8 @@ def test_handle_incoming_message(client, auth, monkeypatch):
         handle_incoming_message(test_incoming_message)
 
     assert DisconnectRecorder.called == 0
-    assert EmitRecorder.called == 2
+    assert EmitRecorder.called_for_token == 2
+    assert EmitRecorder.called_for_message == 2
 
 
 def test_handle_incoming_message_sends_error_message(client, auth, monkeypatch):
@@ -269,25 +276,3 @@ def test_send_response_emits_message(monkeypatch):
     send_response(1, "message_text")
 
     assert EmitRecorder.event == "message"
-
-
-def test_callback_handler(monkeypatch):
-    """Test if the callback handler calls send_next_token."""
-    callback_handler = AinteractionCallbackHandler(1)
-    assert callback_handler.on_chat_model_start(None, None) is None
-
-    class SendNextTokenRecorder:
-        """Helper class to record function call to send_next_token()."""
-
-        response_id = None
-        token = None
-
-    def fake_send_next_token(response_id, token):
-        SendNextTokenRecorder.response_id = response_id
-        SendNextTokenRecorder.token = token
-
-    monkeypatch.setattr("backaind.ainteraction.send_next_token", fake_send_next_token)
-    callback_handler.on_llm_new_token("test")
-
-    assert SendNextTokenRecorder.response_id == 1
-    assert SendNextTokenRecorder.token == "test"
