@@ -80,10 +80,11 @@ def reply(
             if knowledge_id is None:
                 inputs["input_knowledge"] = []
             else:
-                knowledge = get_knowledge(knowledge_id)
-                inputs["input_knowledge"] = knowledge.similarity_search(
-                    input_text, k=1 if has_memory else 4
-                )
+                with UpdatedEnvironment({"TOKENIZERS_PARALLELISM": "false"}):
+                    knowledge = get_knowledge(knowledge_id)
+                    inputs["input_knowledge"] = knowledge.similarity_search(
+                        input_text, k=1 if has_memory else 4
+                    )
         elif input_key == "input_history":
             if memory is None:
                 inputs["input_history"] = ""
