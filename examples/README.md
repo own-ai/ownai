@@ -1,6 +1,6 @@
 # Examples
 
-If you want to get started quickly and run your AIs by yourself, please have a look at the [ctransformers](./ctransformers), [gpt4all](./gpt4all) and [huggingface_pipeline](./huggingface_pipeline) examples.
+If you want to get started quickly and run your AIs by yourself, please have a look at the [llamacpp](./llamacpp) examples.
 These allow you to run your own AIs on your machine with little or no further setup.
 
 ## AI provider examples

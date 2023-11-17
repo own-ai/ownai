@@ -1,0 +1,54 @@
+{
+  "name": "Helpful Assistant with additional knowledge",
+  "aifileversion": 1,
+  "chain": {
+    "_type": "stuff_documents_chain",
+    "callback_manager": null,
+    "callbacks": null,
+    "document_prompt": {
+      "_type": "prompt",
+      "input_variables": [
+        "page_content"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "{page_content}",
+      "template_format": "f-string",
+      "validate_template": true
+    },
+    "document_separator": "\n\n",
+    "document_variable_name": "summaries",
+    "input_key": "input_knowledge",
+    "llm_chain": {
+      "_type": "llm_chain",
+      "llm": {
+        "_type": "llamacpp",
+        "max_tokens": 2000,
+        "model_path": "./instance/llama-2-7b-chat.Q4_K_M.gguf",
+        "n_ctx": 2048,
+        "temperature": 0.8,
+        "top_p": 1,
+        "verbose": true
+      },
+      "memory": null,
+      "output_key": "text",
+      "prompt": {
+        "_type": "prompt",
+        "input_variables": [
+          "summaries",
+          "input_text",
+          "input_history"
+        ],
+        "output_parser": null,
+        "partial_variables": {},
+        "template": "<s>[INST] <<SYS>>You are a helpful assistant for question-answering tasks. Use the following context to answer the question. If you don't know the answer, just say that you don't know.\n\n<context>\n{summaries}\n</context>\n<</SYS>>\n\n{input_history}</s>\n<s>[INST]{input_text} [/INST]\n",
+        "template_format": "f-string",
+        "validate_template": true
+      },
+      "verbose": false
+    },
+    "memory": null,
+    "output_key": "output_text",
+    "verbose": false
+  }
+}

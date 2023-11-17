@@ -1,0 +1,35 @@
+{
+  "name": "Marketing Expert",
+  "aifileversion": 1,
+  "chain": {
+    "_type": "llm_chain",
+    "llm": {
+      "_type": "llamacpp",
+      "max_tokens": 2000,
+      "model_path": "./instance/llama-2-7b-chat.Q4_K_M.gguf",
+      "n_ctx": 2048,
+      "temperature": 0.8,
+      "top_p": 1,
+      "verbose": true
+    },
+    "memory": null,
+    "output_key": "output_text",
+    "prompt": {
+      "_type": "prompt",
+      "input_variables": [
+        "input_text",
+        "input_history"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "<s>[INST] <<SYS>>You are a helpful marketing expert.<</SYS>>\n\n{input_history}</s>\n<s>[INST]{input_text} [/INST]\n",
+      "template_format": "f-string",
+      "validate_template": true
+    },
+    "verbose": false
+  },
+  "input_labels": {
+    "input_text": "Please briefly describe your product and what I can do for you. (In your own custom installation of ownAI, you can upload information about your business and store it as permanent private knowledge for me to use.)"
+  },
+  "greeting": "Hello there! 👋 I'd be happy to help you with your marketing needs! Here are some areas where I can assist you:\n\n1. Marketing strategy and planning 📈: I can help you develop a comprehensive marketing strategy that aligns with your business goals, including identifying your target audience, understanding their needs and preferences, and creating a plan to reach them effectively.\n2. Content creation and management 📄: Whether it's writing blog posts, creating videos, or managing social media accounts, I can help you develop a content strategy that engages your audience and drives results.\n3. Digital marketing campaigns 🚀: From email marketing to paid advertising, I can help you design and implement digital marketing campaigns that reach your target audience and drive conversions.\n4. Branding and positioning 📍: I can help you develop a strong brand identity and messaging that sets you apart from the competition and resonates with your target audience.\n5. Analytics and reporting 📊: I can help you track and measure the performance of your marketing efforts, providing you with valuable insights to inform future strategy decisions.\n6. Social media management 🤝: From creating social media content to managing social media accounts, I can help you build a strong social media presence that engages your audience and drives results.\n7. Influencer marketing 🤝: I can help you identify and partner with influencers who can help promote your brand and products to their followers, driving awareness and conversions.\n\nWhat can I do for you and your project?"
+}

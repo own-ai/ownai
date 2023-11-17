@@ -70,7 +70,21 @@ flask db upgrade
 flask add-user
 ```
 
-8. Start the server:
+8. Optionally: Set up your first AI. We recommend starting with the Llama 2 model and the _Helpful Assistant_ example.
+
+Download the model (this needs about 4 GB of disk space):
+
+```
+flask download-model --repo "TheBloke/Llama-2-7B-Chat-GGUF" --filename "llama-2-7b-chat.Q4_K_M.gguf"
+```
+
+Add the AI:
+
+```
+flask add-ai --aifile ./examples/llamacpp/helpful_assistant.aifile
+```
+
+9. Start the server:
 
 ```
 flask run
@@ -132,7 +146,7 @@ In the [examples directory](./examples) you can find many different examples to 
 
 Please also refer to the [readme file](./examples/README.md) in the examples directory.
 
-If you want to get started quickly and run your AIs by yourself, please have a look at the [ctransformers](./examples/ctransformers/), [gpt4all](./examples/gpt4all/) and [huggingface_pipeline](./examples/huggingface_pipeline/) examples.
+If you want to get started quickly and run your AIs by yourself, please have a look at the [llamacpp](./examples/llamacpp/) examples.
 These allow you to run your own AIs on your machine with little or no further setup.
 
 If you want to create your own aifiles, have a look at the [aifilemaker.py](./aifilemaker.py) script, which you can use as a starting point.

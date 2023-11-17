@@ -6,9 +6,13 @@ This allows you to run [supported models](https://github.com/ggerganov/llama.cpp
 
 ## Set up
 
-To use these AIs, please download the aifile and load it with ownAI (in ownAI, click on the logo in the upper left corner to open the menu, then select "AI Workshop", then "New AI" and "Load Aifile").
+1. Download the model (this needs about 4 GB of disk space):
 
-Please download a model compatible with llama.cpp and adjust the `model_path` in the aifile.
+```
+flask download-model --repo "TheBloke/Llama-2-7B-Chat-GGUF" --filename "llama-2-7b-chat.Q4_K_M.gguf"
+```
+
+2. Download the aifile and load it with ownAI (in ownAI, click on the logo in the upper left corner to open the menu, then select "AI Workshop", then "New AI" and "Load Aifile").
 
 ## Privacy
 

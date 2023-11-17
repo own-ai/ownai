@@ -1,0 +1,35 @@
+{
+  "name": "Bob's Personal Assistant",
+  "aifileversion": 1,
+  "chain": {
+    "_type": "llm_chain",
+    "llm": {
+      "_type": "llamacpp",
+      "max_tokens": 2000,
+      "model_path": "./instance/llama-2-7b-chat.Q4_K_M.gguf",
+      "n_ctx": 2048,
+      "temperature": 0.8,
+      "top_p": 1,
+      "verbose": true
+    },
+    "memory": null,
+    "output_key": "output_text",
+    "prompt": {
+      "_type": "prompt",
+      "input_variables": [
+        "input_text",
+        "input_history"
+      ],
+      "output_parser": null,
+      "partial_variables": {},
+      "template": "<s>[INST] <<SYS>>You are my personal assistant. My name is Bob. My interests include travel and Mexican food.<</SYS>>\n\n{input_history}</s>\n<s>[INST]{input_text} [/INST]\n",
+      "template_format": "f-string",
+      "validate_template": true
+    },
+    "verbose": false
+  },
+  "input_labels": {
+    "input_text": "Tell me something"
+  },
+  "greeting": "Hi Bob! How can I help you?"
+}
