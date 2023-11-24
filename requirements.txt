@@ -37,7 +37,7 @@ coverage==7.3.2
 cpufeature==0.2.1
 croniter==1.4.1
 cryptography==41.0.4
-ctransformers==0.2.27
+ctransformers==0.2.27 --no-binary ctransformers
 dataclasses-json==0.5.13
 decorator==5.1.1
 Deprecated==1.2.14

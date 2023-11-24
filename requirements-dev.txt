@@ -23,7 +23,7 @@ banana-dev
 beam-sdk
 boto3 # for AWS / SageMaker
 cohere
-ctransformers
+ctransformers --no-binary ctransformers
 google-cloud-aiplatform # for VertexAI
 google-generativeai
 gpt4all
