@@ -10,7 +10,22 @@
     :class="message.author.species === 'ai' && 'bg-light'"
     :key="message.id"
   >
-    <div class="card-body" :class="message.status">
+    <div v-if="message.status === 'writing' && !message.text" class="card-body">
+      <div
+        class="progress"
+        role="progressbar"
+        aria-label="Progress"
+        :aria-valuenow="progresses[message.id]"
+        aria-valuemin="0"
+        aria-valuemax="100"
+      >
+        <div
+          class="progress-bar"
+          :style="`width: ${progresses[message.id]}%`"
+        ></div>
+      </div>
+    </div>
+    <div v-else class="card-body" :class="message.status">
       <span class="d-none badge text-bg-danger error-badge me-2">Error 😩</span
       >{{ message.text }}
     </div>
@@ -25,9 +40,10 @@
 <script setup lang="ts">
 import type { Message } from "@/types/ainteraction/Message";
 
-const { greeting, messages } = defineProps<{
+const { greeting, messages, progresses } = defineProps<{
   greeting?: string;
   messages: Message[];
+  progresses: number[];
 }>();
 const emit = defineEmits(["clear-messages"]);
 </script>

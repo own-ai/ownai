@@ -17,6 +17,7 @@ from backaind.brain import (
     run_chain_on_multiprocessing,
     run_chain_process,
     set_text_generation_inference_token,
+    estimate_processing_time,
     UpdatedEnvironment,
 )
 import backaind.brain
@@ -31,6 +32,7 @@ class FakeChain:
         if kwargs.get("callbacks"):
             for callback_handler in kwargs["callbacks"]:
                 callback_handler.on_chat_model_start(None, None)
+                callback_handler.on_llm_start({}, ["testprompt"])
                 callback_handler.on_llm_new_token("testtoken")
         output = f"{inputs['input_text']},{inputs['input_knowledge']},{inputs['input_history']}"
         return {"output_text": output}
@@ -70,7 +72,7 @@ def test_reply_runs_the_chain(monkeypatch):
     def fake_get_chain(_ai_id, _updated_environment):
         return (FakeChain(), set(("input_text", "input_knowledge", "input_history")))
 
-    def fake_run(chain, inputs, _on_token):
+    def fake_run(chain, inputs, _on_token, _on_progress):
         return chain(inputs)["output_text"]
 
     monkeypatch.setattr("backaind.brain.get_chain", fake_get_chain)
@@ -99,7 +101,7 @@ def test_reply_sets_inputs(monkeypatch):
     def fake_get_knowledge(_knowledge_id):
         return FakeKnowledge()
 
-    def fake_run(chain, inputs, _on_token):
+    def fake_run(chain, inputs, _on_token, _on_progress):
         return chain(inputs)["output_text"]
 
     monkeypatch.setattr("backaind.brain.get_chain", fake_get_chain)
@@ -131,11 +133,11 @@ def test_reply_chooses_the_right_way_of_processing(monkeypatch):
     def fake_get_chain(_ai_id, _updated_environment):
         return (FakeChain(), set(("input_text", "input_knowledge", "input_history")))
 
-    def fake_run_chain_on_multiprocessing(chain, inputs, _on_token):
+    def fake_run_chain_on_multiprocessing(chain, inputs, _on_token, _on_progress):
         RunRecorder.run_on_multiprocessing = True
         return chain(inputs)["output_text"]
 
-    def fake_run_chain_on_gunicorn(chain, inputs, _on_token):
+    def fake_run_chain_on_gunicorn(chain, inputs, _on_token, _on_progress):
         RunRecorder.run_on_gunicorn = True
         return chain(inputs)["output_text"]
 
@@ -165,23 +167,27 @@ def test_reply_chooses_the_right_way_of_processing(monkeypatch):
 def test_run_chain_on_gunicorn(monkeypatch):
     """Test if the runner function for gipc works."""
 
-    def fake_pipe():
-        class FakePipe:
-            """Helper class to mock a gipc pipe."""
-
-            def __enter__(self):
-                test_queue = queue.Queue()
-                return (test_queue, test_queue)
-
-            def __exit__(self, _type, _value, _traceback):
-                pass
-
-        return FakePipe()
-
     def fake_start_process(**kwargs):
-        kwargs["args"][2].put(("token", "testtoken"))
+        kwargs["args"][2].put(None)
+        kwargs["args"][2].put(("prompts", ["testprompt"]))
+        kwargs["args"][2].put(None)
+        kwargs["args"][2].put(None)
+        kwargs["args"][2].put(("token", "testtoken1"))
+        kwargs["args"][2].put(("token", "testtoken2"))
         kwargs["args"][2].put(("test", "test"))
         kwargs["args"][2].put(("done", "testtext"))
+
+    class FakeTimeout:
+        """Helper class to mock a timeout."""
+
+        def __init__(self, seconds, exception) -> None:
+            pass
+
+        def __enter__(self):
+            return None
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            pass
 
     class OnTokenRecorder:
         """Helper class to record the call to on_token."""
@@ -191,32 +197,68 @@ def test_run_chain_on_gunicorn(monkeypatch):
     def fake_on_token(token):
         OnTokenRecorder.token = token
 
-    monkeypatch.setattr("gipc.pipe", fake_pipe)
+    def fake_on_progress(_progress):
+        pass
+
     monkeypatch.setattr("gipc.start_process", fake_start_process)
+    monkeypatch.setattr("gevent.Timeout", FakeTimeout)
+
+    text = run_chain_on_gunicorn(
+        FakeChain(),
+        {"input_text": "Hi", "input_knowledge": "", "input_history": ""},
+        None,
+        None,
+    )
+    assert OnTokenRecorder.token is None
+    assert text == "testtext"
+
     text = run_chain_on_gunicorn(
         FakeChain(),
         {"input_text": "Hi", "input_knowledge": "", "input_history": ""},
         fake_on_token,
+        fake_on_progress,
     )
-
-    assert OnTokenRecorder.token == "testtoken"
+    assert OnTokenRecorder.token == "testtoken2"
     assert text == "testtext"
 
 
 def test_run_chain_on_multiprocessing(monkeypatch):
     """Test if the runner function for multiprocessing works."""
 
-    def fake_process(**kwargs):
+    def fake_process(**_kwargs):
         class FakeProcess:
             """Helper class to mock a multiprocessing process."""
 
             def start(self):
                 """Does nothing, but is called by the runner."""
 
-        kwargs["args"][2].put(("token", "testtoken"))
-        kwargs["args"][2].put(("other", "test"))
-        kwargs["args"][2].put(("done", "testtext"))
         return FakeProcess()
+
+    def fake_queue():
+        class FakeQueue:
+            """Helper class to mock a multiprocessing queue."""
+
+            returns = [
+                None,
+                ("prompts", ["testprompt"]),
+                None,
+                None,
+                ("token", "testtoken1"),
+                ("token", "testtoken2"),
+                ("other", "test"),
+                ("done", "testtext"),
+            ]
+            index = 0
+
+            def get(self, _block, _timeout):
+                """Return the next test item."""
+                current = self.returns[self.index]
+                self.index += 1
+                if current is None:
+                    raise queue.Empty()
+                return current
+
+        return FakeQueue()
 
     class OnTokenRecorder:
         """Helper class to record the call to on_token."""
@@ -226,14 +268,29 @@ def test_run_chain_on_multiprocessing(monkeypatch):
     def fake_on_token(token):
         OnTokenRecorder.token = token
 
+    def fake_on_progress(_progress):
+        pass
+
+    monkeypatch.setattr("backaind.brain.global_chain_ppwps", 1)
     monkeypatch.setattr("multiprocessing.Process", fake_process)
+    monkeypatch.setattr("multiprocessing.Queue", fake_queue)
+
+    text = run_chain_on_multiprocessing(
+        FakeChain(),
+        {"input_text": "Hi", "input_knowledge": "", "input_history": ""},
+        None,
+        None,
+    )
+    assert OnTokenRecorder.token is None
+    assert text == "testtext"
+
     text = run_chain_on_multiprocessing(
         FakeChain(),
         {"input_text": "Hi", "input_knowledge": "", "input_history": ""},
         fake_on_token,
+        fake_on_progress,
     )
-
-    assert OnTokenRecorder.token == "testtoken"
+    assert OnTokenRecorder.token == "testtoken2"
     assert text == "testtext"
 
 
@@ -245,6 +302,9 @@ def test_run_chain_process():
         {"input_text": "Hi", "input_knowledge": "", "input_history": ""},
         result_queue,
     )
+    result_type, result = result_queue.get()
+    assert result_type == "prompts"
+    assert result == ["testprompt"]
     result_type, result = result_queue.get()
     assert result_type == "token"
     assert result == "testtoken"
@@ -266,6 +326,15 @@ def test_set_text_generation_inference_token():
     assert all_huggingface_instances[0].client.headers == {
         "Authorization": "Bearer test_token"
     }
+
+
+def test_estimate_processing_time(monkeypatch):
+    """Test if the processing time is estimated correctly."""
+    monkeypatch.setattr("backaind.brain.global_chain_ppwps", 2)
+    assert estimate_processing_time("Hi") == 1
+    assert estimate_processing_time("Hi Hi") == 1
+    assert estimate_processing_time("Hi Hi Hi") == 1
+    assert estimate_processing_time("Hi Hi Hi Hi") == 2
 
 
 def test_updated_environment_resets_values():

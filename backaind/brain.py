@@ -1,7 +1,8 @@
 """Provide AI data processing capabilities."""
 import os
+import queue
 from threading import Lock
-from typing import Callable, Optional, Set, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.chains.base import Chain
@@ -13,10 +14,13 @@ from backaind.extensions import db
 from backaind.knowledge import get_knowledge
 from backaind.models import Ai
 
+DEFAULT_PPWPS = 2.0
 # pylint: disable=invalid-name
 global_chain = None
 global_chain_id = None
 global_chain_input_keys = None
+# prompt processing words per second
+global_chain_ppwps = DEFAULT_PPWPS
 # pylint: enable=invalid-name
 chain_lock = Lock()
 
@@ -26,7 +30,7 @@ def get_chain(
 ) -> Tuple[Chain, Set[str]]:
     """Load the AI chain or create a new chain if it doesn't exist."""
     # pylint: disable=global-statement
-    global global_chain, global_chain_id, global_chain_input_keys
+    global global_chain, global_chain_id, global_chain_input_keys, global_chain_ppwps
     with chain_lock:
         chain = global_chain
         chain_id = global_chain_id
@@ -40,6 +44,7 @@ def get_chain(
             global_chain = chain
             global_chain_id = ai_id
             global_chain_input_keys = chain_input_keys
+            global_chain_ppwps = DEFAULT_PPWPS
     return (chain, chain_input_keys)
 
 
@@ -49,12 +54,13 @@ def reset_global_chain(ai_id=None):
     If ai_id is set, it only drops the global chain instance if it matches this ID.
     """
     # pylint: disable=global-statement
-    global global_chain, global_chain_id, global_chain_input_keys
+    global global_chain, global_chain_id, global_chain_input_keys, global_chain_ppwps
     with chain_lock:
         if not ai_id or ai_id == global_chain_id:
             global_chain = None
             global_chain_id = None
             global_chain_input_keys = None
+            global_chain_ppwps = DEFAULT_PPWPS
 
 
 def reply(
@@ -62,7 +68,8 @@ def reply(
     input_text: str,
     knowledge_id: Optional[int] = None,
     memory: Optional[BaseMemory] = None,
-    on_token: Callable[[str], None] = None,
+    on_token: Optional[Callable[[str], None]] = None,
+    on_progress: Optional[Callable[[int], None]] = None,
     updated_environment: Optional[dict] = None,
 ) -> str:
     """Run the chain with an input message and return the AI output."""
@@ -92,29 +99,58 @@ def reply(
                 inputs["input_history"] = memory.load_memory_variables({})["history"]
 
     if "gunicorn" in os.environ.get("SERVER_SOFTWARE", ""):
-        return run_chain_on_gunicorn(chain, inputs, on_token)
-    return run_chain_on_multiprocessing(chain, inputs, on_token)
+        return run_chain_on_gunicorn(chain, inputs, on_token, on_progress)
+    return run_chain_on_multiprocessing(chain, inputs, on_token, on_progress)
 
 
-def run_chain_on_gunicorn(chain: Chain, inputs: dict, on_token: Callable[[str], None]):
+def run_chain_on_gunicorn(
+    chain: Chain,
+    inputs: dict,
+    on_token: Optional[Callable[[str], None]],
+    on_progress: Optional[Callable[[int], None]],
+):
     """Run the chain with gipc in the context of gevent."""
-    # pylint: disable-next=import-outside-toplevel
+    # pylint: disable=import-outside-toplevel
+    import gevent
     import gipc
 
     with gipc.pipe() as (readend, writeend):
         gipc.start_process(
             target=run_chain_process, args=(chain, inputs, writeend), daemon=True
         )
+        seconds_estimated = 0
+        seconds_passed = 0
+        prompt = ""
+        updated_global_chain_ppwps = False
         while True:
-            result_type, text = readend.get()
-            if result_type == "token":
-                on_token(text)
-            elif result_type == "done":
-                return text
+            message = None
+            with gevent.Timeout(1, False) as timeout:
+                message = readend.get(timeout=timeout)
+            if message is None:
+                if seconds_estimated:
+                    seconds_passed += 1
+                    if on_progress and seconds_passed <= seconds_estimated:
+                        on_progress(int(seconds_passed / seconds_estimated * 100))
+            else:
+                result_type, text = message
+                if result_type == "token":
+                    if on_token:
+                        on_token(text)
+                    if not updated_global_chain_ppwps:
+                        updated_global_chain_ppwps = True
+                        update_global_chain_ppwps(prompt, seconds_passed)
+                elif result_type == "done":
+                    return text
+                elif result_type == "prompts":
+                    prompt = "\n".join(text)
+                    seconds_estimated = estimate_processing_time(prompt)
 
 
 def run_chain_on_multiprocessing(
-    chain: Chain, inputs: dict, on_token: Callable[[str], None]
+    chain: Chain,
+    inputs: dict,
+    on_token: Optional[Callable[[str], None]],
+    on_progress: Optional[Callable[[int], None]],
 ):
     """Run the chain with multiprocessing (won't work with gevent)."""
     # pylint: disable-next=import-outside-toplevel
@@ -124,12 +160,29 @@ def run_chain_on_multiprocessing(
     multiprocessing.Process(
         target=run_chain_process, args=(chain, inputs, result_queue), daemon=True
     ).start()
+    seconds_estimated = 0
+    seconds_passed = 0
+    prompt = ""
+    updated_global_chain_ppwps = False
     while True:
-        result_type, text = result_queue.get()
-        if result_type == "token":
-            on_token(text)
-        elif result_type == "done":
-            return text
+        try:
+            result_type, text = result_queue.get(True, 1)
+            if result_type == "token":
+                if on_token:
+                    on_token(text)
+                if not updated_global_chain_ppwps:
+                    updated_global_chain_ppwps = True
+                    update_global_chain_ppwps(prompt, seconds_passed)
+            elif result_type == "done":
+                return text
+            elif result_type == "prompts":
+                prompt = "\n".join(text)
+                seconds_estimated = estimate_processing_time(prompt)
+        except queue.Empty:
+            if seconds_estimated:
+                seconds_passed += 1
+                if on_progress and seconds_passed <= seconds_estimated:
+                    on_progress(int(seconds_passed / seconds_estimated * 100))
 
 
 def run_chain_process(chain: Chain, inputs: dict, putable):
@@ -140,6 +193,11 @@ def run_chain_process(chain: Chain, inputs: dict, putable):
 
         def on_chat_model_start(self, serialized, messages, **kwargs):
             pass
+
+        def on_llm_start(
+            self, serialized: Dict[str, Any], prompts: List[str], **kwargs: Any
+        ) -> Any:
+            putable.put(("prompts", prompts))
 
         def on_llm_new_token(self, token: str, **kwargs) -> None:
             putable.put(("token", token))
@@ -170,6 +228,18 @@ def set_text_generation_inference_token(chain: Chain):
     all_huggingface_instances = find_instances(chain, HuggingFaceTextGenInference)
     for instance in all_huggingface_instances:
         instance.client.headers = {"Authorization": f"Bearer {token}"}
+
+
+def estimate_processing_time(prompt: str) -> int:
+    """Estimate the processing time for a prompt."""
+    return int(len(prompt.split()) / global_chain_ppwps) or 1
+
+
+def update_global_chain_ppwps(prompt: str, seconds_passed: int):
+    """Update the global chain prompt processing words per second score."""
+    # pylint: disable=global-statement
+    global global_chain_ppwps
+    global_chain_ppwps = len(prompt.split()) / (seconds_passed or 1)
 
 
 class UpdatedEnvironment:

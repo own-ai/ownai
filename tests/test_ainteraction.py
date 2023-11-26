@@ -7,6 +7,7 @@ from backaind.ainteraction import (
     get_knowledge_data,
     is_ai_public,
     is_knowledge_public,
+    send_progress,
     send_next_token,
     send_response,
 )
@@ -151,7 +152,13 @@ def test_handle_incoming_message(client, auth, monkeypatch):
             EmitRecorder.called_for_message += 1
 
     def fake_reply(
-        _ai_id, _input_text, _knowledge_id, _memory, on_token, _updated_environment
+        _ai_id,
+        _input_text,
+        _knowledge_id,
+        _memory,
+        on_token,
+        _on_progress,
+        _updated_environment,
     ):
         on_token("token")
         return "Fake response"
@@ -242,6 +249,23 @@ def test_is_knowledge_public(app):
     with app.app_context():
         assert is_knowledge_public(1)
         assert not is_knowledge_public(2)
+
+
+def test_send_progress_emits_progress(monkeypatch):
+    """Test if a call to send_progress emits the 'progress' event."""
+
+    class EmitRecorder:
+        """Helper class to record function call to emit()."""
+
+        event = None
+
+    def fake_emit(event, _arg):
+        EmitRecorder.event = event
+
+    monkeypatch.setattr("backaind.ainteraction.emit", fake_emit)
+    send_progress(1, 100)
+
+    assert EmitRecorder.event == "progress"
 
 
 def test_send_next_token_emits_token(monkeypatch):

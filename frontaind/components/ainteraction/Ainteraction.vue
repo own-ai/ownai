@@ -15,6 +15,7 @@
     <MessageHistory
       :greeting="selectedAi?.greeting"
       :messages="messages"
+      :progresses="progresses"
       @clear-messages="clearMessages"
     />
     <MessageInput
@@ -37,6 +38,7 @@ import { slugify } from "@/helpers/slugify";
 import type { BasicAi } from "@/types/ainteraction/BasicAi";
 import type { BasicKnowledge } from "@/types/ainteraction/BasicKnowledge";
 import type { Message } from "@/types/ainteraction/Message";
+import type { ProgressUpdate } from "@/types/ainteraction/ProgressUpdate";
 import type { Token } from "@/types/ainteraction/Token";
 
 const { ais, knowledges } = defineProps<{
@@ -99,8 +101,16 @@ const selectionDisabled = ref<boolean>(false);
 
 const messages = ref<Message[]>([]);
 const nextMessageIndex = ref(0);
+const progresses = ref<number[]>([]);
 
 const socket = io();
+
+socket.on("progress", (incoming: ProgressUpdate) => {
+  if (progresses.value.length <= incoming.messageId) {
+    return;
+  }
+  progresses.value[incoming.messageId] = incoming.progress;
+});
 
 socket.on("token", (incoming: Token) => {
   if (messages.value.length <= incoming.messageId) {
@@ -149,6 +159,7 @@ const sendMessage = (text: string) => {
   const history = messages.value.filter((message) => message.status === "done");
 
   messages.value.push(userMessage, aiResponse);
+  progresses.value.push(100, 0);
   socket.emit("message", {
     message: userMessage,
     responseId: aiResponse.id,
@@ -160,6 +171,7 @@ const sendMessage = (text: string) => {
 
 const clearMessages = () => {
   messages.value = [];
+  progresses.value = [];
   nextMessageIndex.value = 0;
   selectionDisabled.value = false;
 };

@@ -66,6 +66,7 @@ def handle_incoming_message(message):
             knowledge_id,
             memory,
             lambda token: send_next_token(response_id, token),
+            lambda progress: send_progress(response_id, progress),
             get_settings(session.get("user_id", -1)).get("external-providers", {}),
         )
         send_response(response_id, response.strip())
@@ -121,6 +122,17 @@ def is_knowledge_public(knowledge_id: int):
     """Check if a knowledge is public."""
     knowledge = db.session.get(Knowledge, knowledge_id)
     return bool(knowledge and knowledge.is_public)
+
+
+def send_progress(response_id: int, progress: int):
+    """Send the current progress to the user."""
+    emit(
+        "progress",
+        {
+            "messageId": response_id,
+            "progress": progress,
+        },
+    )
 
 
 def send_next_token(response_id: int, token_text: str):
