@@ -2,6 +2,10 @@
 
 flask --app backaind db upgrade
 
+if [ -n "$OWNAI_DOWNLOAD_REPO" ] && [ -n "$OWNAI_DOWNLOAD_FILE" ]; then
+    flask --app backaind download-model --repo $OWNAI_DOWNLOAD_REPO --filename $OWNAI_DOWNLOAD_FILE
+fi
+
 if [ -n "$OWNAI_ROOT_USER" ] && [ -n "$OWNAI_ROOT_PASSWORD" ]; then
     flask --app backaind add-user --username $OWNAI_ROOT_USER --password $OWNAI_ROOT_PASSWORD
 fi

@@ -171,7 +171,7 @@ Rename the file to `docker.env` and edit the file.
 Then run the following command (replace `<your-username>` and `<your-password>`):
 
 ```
-docker run --name ownai --env OWNAI_ROOT_USER=<your-username> --env OWNAI_ROOT_PASSWORD=<your-password> --env-file ./docker.env -p 5000:5000 ownai/ownai
+docker run --name ownai --env OWNAI_ROOT_USER=<your-username> --env OWNAI_ROOT_PASSWORD=<your-password> --env OWNAI_DOWNLOAD_REPO="TheBloke/Llama-2-7B-Chat-GGUF" --env OWNAI_DOWNLOAD_FILE="llama-2-7b-chat.Q4_K_M.gguf" --env-file ./docker.env -p 5000:5000 ownai/ownai
 ```
 
 This is only required for the first run. To start the server again just run:

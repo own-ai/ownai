@@ -4,7 +4,7 @@ from setuptools import find_namespace_packages, setup
 
 setup(
     name="ownAI",
-    version="0.3.0",
+    version="0.4.0",
     description="Run your own AI",
     url="https://ownai.org",
     license="MIT",
