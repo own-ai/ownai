@@ -1,3 +1,6 @@
+| 📼📠 This is an old version of ownAI. Please use the [new version](https://github.com/own-ai/own-ai). 📠📼 |
+| --- |
+
 # ownAI
 
 With ownAI you can run your own AIs.
