@@ -1,5 +1,13 @@
-| 📼📠 This is an old version of ownAI. Please use the [new version](https://github.com/own-ai/own-ai). 📠📼 |
-| --- |
+## ⚠️ Deprecation Notice
+
+This repository has been **archived** and is no longer actively maintained.
+
+Please use the new app instead:  
+👉 [https://github.com/own-ai/app](https://github.com/own-ai/app)
+
+Thank you for your support!
+
+---
 
 # ownAI
 
